@@ -1,0 +1,69 @@
+Java 22 arrives with previews of scoped values, structured concurrency, stream gatherers, and the ability to execute multi-file programs.
+Share on Facebook Share on Twitter Share on LinkedIn Share on Reddit Share by Email Print resource
+Paul KrillBy Paul Krill
+Editor at Large, InfoWorld | MAR 19, 2024 6:30 AM PDT
+
+
+Jessica Lewis (CC0)
+
+
+
+
+
+Java Development Kit 22, the next version of Java Standard Edition, is now available as a production release. JDK 22 includes 12 features, with a second preview of scoped values and a preview of stream gatherers being the last additions.
+
+Downloadable from oracle.com, JDK 22 is a short-term release that will receive Premier support from Oracle for six months. Long-term support releases such as predecessor JDK 21 receive five years of Premier support. Extended support is available for JDK 21 until September 2031.
+
+[ Also on InfoWorld: 11 reasons the new Java is not like the old Java ]
+JDK 22 offers capabilities from OpenJDK development projects including Amber, which develops smaller, productivity-oriented Java language features; Loom, which develops Java virtual machine features and APIs; and Panama, which develops interconnections between Java and non-Java APIs.
+
+Scoped values, from Project Loom, enable the safe and efficient sharing of immutable data within and across threads. These are preferred to thread-local variables, especially when using large numbers of thread variables. Goals include ease of use, comprehensibility, robustness, and performance.
+
+
+Stream gatherers will enhance the stream API to support custom intermediate operations. This preview feature will allow stream pipelines to transform data in ways not easily achievable with existing built-in intermediate operations.
+
+These latest features join a second preview of structured concurrency, a preview of statements before super(…), a preview of a class-file API, region pinning for the G1 garbage collector, a second preview of string templates, unnamed variables and patterns, a foreign function and memory API, and a seventh incubator of a vector API. A second preview of implicitly declared classes and instance main methods, and an enhancement to the Java launcher that would enable it to run multi-file programs, also have been proposed.
+
+With structured concurrency, from Project Loom, concurrent programming is simplified through an API that treats groups of related tasks running in different threads as a single unit of work, thereby streamlining error handling and cancellation, improving reliability, and enhancing observability. This API was previewed in JDK 21 and incubated in JDK 19 and JDK 20.
+
+The enhancement to the Java application launcher will allow it to run a program supplied as multiple files of Java source code. The goal behind the ability to launch multi-file source code programs is to make the transition from small programs to larger programs more gradual, allowing developers to choose whether and when to go to the trouble of configuring a build tool.
+
+The class-file API will provide a standard API for parsing, generating, and transforming Java class files. It is intended to enable JDK components to migrate to the standard API and eventually remove the JDK’s internal copy of the third-party ASM library. Parsing, generating, and transforming class files is ubiquitous, used by independent tools and libraries to examine and extend programs without jeopardizing maintainability of source code.
+
+However, the Java class-file format evolves more quickly now than previously, due to standard Java’s six-month release cadence. This speed of evolution has resulted in frameworks more frequently encountering class files that are newer than the class-file library. This has resulted in errors and in framework developers trying to write code to parse class files from the future and hoping nothing too serious will change. The plan is to have the Java platform define and implement a standard class-file API to evolve together with the class-file format.
+
+Region pinning for G1 is intended to reduce latency, so that garbage collection (GC) need not be disabled during Java Native Interface (JNI) critical regions. Goals include no stalling of threads due to critical JNI regions, no added latency to start garbage collection due to these regions, no regressions in GC pause times when none of these regions are active, and minimal regressions in GC pause times when these regions are active. Currently, the default GC, G1, disables garbage collection during every critical region, which can have a significant impact on latency. With this change, Java threads will never wait for a G1 GC operation to complete.
+
+Implicitly declared classes and instance methods, from Project Amber, was previewed in JDK 21 as unnamed classes and instance methods. This feature would get the revised title and significant changes in JDK 22 in a second preview. The capability is intended to evolve the Java language so students could write their first programs without needing to understand language features designed for large programs. Students could write streamlined declarations for single-class programs and then seamlessly expand programs to use more advanced features as their skills grow.
+
+The preview of statements before super(…), also from Project Amber, pertains to constructors in the language, allowing statements that do not reference the instance being created to appear before an explicit constructor. A goal of the plan includes giving developers greater freedom to express the behavior of constructors, enabling more natural placement of logic that currently must be factored into auxiliary static methods, auxiliary intermediate constructors, or constructor arguments.
+
+Another goal is preserving the existing guarantee that constructors run in top-down order during class instantiation, ensuring that code in a subclass constructor cannot interfere with superclass instantiation. A third stated goal is not requiring any changes to the JVM. This is the only JDK 22 feature, so far, that has not yet been previously previewed or incubated in standard Java.
+
+String templates, another feature from Project Amber, will complement Java’s existing string literals and text blocks by coupling literal text with embedded expressions and template processors to produce specialized results. Goals include:
+
+Simplifying the writing of Java programs by making it easy to express strings that include values computed at run time.
+Enhancing the readability of expressions that mix text and expressions, whether the text fits on a single source line or spans several source lines.
+Improving security of programs that compose strings from user-provided values and pass them to other systems by supporting validation and transformation of both the template and the values of its embedded expressions.
+Retaining flexibility by allowing Java libraries to define the formatting syntax used in string templates.
+Simplifying the use of APIs that accept strings written in non-Java languages, such as XML and JSON.
+Enabling creation of non-string values computed from literal text and embedded expressions without needing to transit through an intermediate string representation.
+String templates appeared in a first preview in JDK 21. The second preview is intended to gain additional experience and feedback. Except for a technical change in the types of template expressions, there are no changes relative to the first preview.
+
+A vector API (seventh incubator), from Project Panama, would express vector computations that reliably compile at runtime to optimal vector instructions on supported CPU architectures, achieving performance superior to equivalent scalar computations. The API provides a way to write complex vector algorithms in Java, using the existing HotSpot auto-vectorization algorithm but with a user model that makes vectorization more predictable and robust.
+
+This capability has been incubated in prior versions of Java dating back to JDK 16 in March 2021. Goals of the API include it being clear and concise, platform-agnostic, and offering reliable runtime compilation and performance on x64 AArch64 architectures as well as graceful degradation.
+
+Unnamed variables and patterns, from Project Amber, can be used when variable declarations or nested patterns are required but never used. Goals of the plan include:
+
+Capturing developer intent that a given binding or lambda parameter is unused, and enforcing that property to clarify programs and reduce opportunities for error
+Improving code maintainability by identifying variables that must be declared but are not used
+Allowing multiple patterns to appear in a single case label, provided that none of them declares pattern variables
+Improving the readability of record patterns by eliding unnecessary nested type patterns
+This proposal was previewed in JDK 21 and will be finalized without change in JDK 22.
+
+The foreign function and memory API, from Project Panama, allows Java programs to interoperate with code and data outside of the Java runtime. By invoking foreign functions and safely accessing foreign memory, Java programs can call native libraries and process native data without the brittleness of JNI (Java Native Interface), the proposal states.
+
+The foreign function and memory API previously was previewed in JDK 19, JDK 20, and JDK 21. It would be finalized in JDK 22. The latest revisions cover four areas: supporting arbitrary charsets for native strings, enabling clients to build C-language function descriptors programmatically, and introducing the Enable-Native-Access JAR-file manifest attribute. The latter allows executable JAR files to call restricted methods without having to use the —enable-native-access command-line option. The fourth area is providing a new linker option that allows clients to pass heap segments to downcall method handles.
+
+New versions of standard Java arrive every six months, and long-term support releases arrive every two years.
