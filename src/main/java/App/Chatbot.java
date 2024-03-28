@@ -5,7 +5,6 @@ import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
-import org.checkerframework.checker.units.qual.C;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -54,7 +53,6 @@ public class Chatbot {
                 .messages(messages)
                 .n(1)
                 .maxTokens(128)
-                .logitBias(new HashMap<>())
                 .build();
 
         List<ChatCompletionChoice> completions = service.createChatCompletion(chatCompletionRequest).getChoices();
