@@ -120,7 +120,7 @@ public class Chatbot {
         System.out.println("+END-------------------------------------------------------+");
     }
 
-    public static void main(String[] args) throws IOException {
+    /*public static void main(String[] args) throws IOException {
         Scanner userinput;                                  // user inputted line as a Scanner
         String cmdline;
         String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
@@ -143,6 +143,6 @@ public class Chatbot {
                 continue;
             System.out.println(cb.getCompletion(cmdline));
         }
-    }
+    }*/
 }
 
