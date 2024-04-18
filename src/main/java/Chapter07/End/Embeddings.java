@@ -1,4 +1,4 @@
-package App;
+package Chapter07.End;
 
 import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.embedding.EmbeddingRequest;

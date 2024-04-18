@@ -1,4 +1,4 @@
-package App;
+package Chapter07.End;
 
 import Utilities.Misc;
 import com.theokanning.openai.embedding.Embedding;
@@ -23,7 +23,7 @@ public class CompareEmbeddings {
         Scanner userinput;
         OpenAiService service = new OpenAiService(token);
 
-        List<Embedding> one = getEmbeddingVec(service, "I often play guitar for a very long time.");
+        List<Embedding> one = getEmbeddingVec(service, "I like the java programming language.");
         List<Double> emb1 = one.get(0).getEmbedding();
         Double[] emb1d = emb1.toArray(new Double[0]);
 

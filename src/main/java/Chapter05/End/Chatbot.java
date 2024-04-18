@@ -1,4 +1,4 @@
-package App;
+package Chapter05.End;
 
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -45,7 +45,7 @@ public class Chatbot {
         final ChatMessage format = new ChatMessage(ChatMessageRole.USER.value(), completion_format);
         messages.add(format);
 
-        showMessages(messages);
+        showMessages(messages);     // Just to show the whole prompt sent to the LLM
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
                 .builder()

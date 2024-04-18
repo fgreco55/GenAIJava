@@ -1,4 +1,4 @@
-package App;
+package Chapter04.End;
 
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
