@@ -20,12 +20,11 @@ public class CompareEmbeddings {
     public static void main(String[] args) throws IOException {
 
         String token = Misc.getProperty(DEFAULT_CONFIG,"chatgpt.apikey");
-        Scanner userinput;
         OpenAiService service = new OpenAiService(token);
 
         List<Embedding> one = getEmbeddingVec(service, "I like the java programming language.");
         List<Double> emb1 = one.get(0).getEmbedding();
-        Double[] emb1d = emb1.toArray(new Double[0]);
+        Double[] emb1d = emb1.toArray(new Double[0]);   // convert from List to array of Doubles
 
         List<Embedding> two = getEmbeddingVec(service, "Java is a programming language.");
         List<Double> emb2 = two.get(0).getEmbedding();
