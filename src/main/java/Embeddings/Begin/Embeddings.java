@@ -1,4 +1,4 @@
-package Embeddings.End;
+package Embeddings.Begin;
 
 import Utilities.Misc;
 import com.theokanning.openai.embedding.Embedding;
@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-
-import static Utilities.Misc.getProperty;
 
 public class Embeddings {
 
@@ -23,14 +21,23 @@ public class Embeddings {
 
         while (true) {
             System.out.print("String to Embed> ");
-            userinput = new java.util.Scanner(System.in);
+            userinput = new Scanner(System.in);
 
             if (userinput.hasNextLine()) {
                 String cmd = userinput.nextLine();
                 if (!cmd.isEmpty()) {
 
-                    List<Embedding> embeddings = getEmbeddingVec(service, cmd);
-                    embeddings.forEach(System.out::println);
+                    /*
+                      Get Embedding vector from embeddings service
+
+                    List<Embedding> embeddings = ...
+                    */
+
+                    /* Display the embedding vector
+
+                    println...
+                    */
+
                     System.out.println("Embedding vector has " + embeddings.get(0).getEmbedding().size() + " elements.");
                 }
             }
