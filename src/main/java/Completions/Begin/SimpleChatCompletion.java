@@ -1,9 +1,7 @@
-package Chapter04.Begin;
+package Completions.Begin;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import Utilities.Misc;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 
 import java.io.IOException;
@@ -17,14 +15,7 @@ import static Utilities.Misc.getConfigProperties;
 public class SimpleChatCompletion {
     public static void main(String[] args) throws IOException {
 
-        String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
-        Properties prop = getConfigProperties(DEFAULT_CONFIG);
-        if (prop == (Properties) null) {
-            System.err.println("Cannot find OpenAI API key.  Your path to the properties is probably incorrect.");
-            System.exit(1);
-        }
-        String token = prop.getProperty("chatgpt.apikey");
-
+        String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token, Duration.ofSeconds(30));
 
         final List<ChatMessage> messages = new ArrayList<>();

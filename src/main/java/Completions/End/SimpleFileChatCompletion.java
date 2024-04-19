@@ -1,5 +1,6 @@
-package Chapter04.End;
+package Completions.End;
 
+import Utilities.Misc;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -11,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -23,18 +23,10 @@ public class SimpleFileChatCompletion {
         List<String> resultsFromLLM = new ArrayList<>();  // results coming back from LLM
 
         ChatMessage userMessage;
-        String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
         String DEFAULT_DATAFILE = "./src/main/resources/mydata.txt";
         String INSTRUCTION = "You are a extremely good grammar-school instructor and will respond as one.";
 
-        Properties prop = getConfigProperties(DEFAULT_CONFIG);
-        if (prop == (Properties) null) {
-            System.err.println("Cannot find properties file. Your path to the properties is probably incorrect.");
-            System.exit(1);
-        }
-        String token = prop.getProperty("chatgpt.apikey");
-
-
+        String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token, Duration.ofSeconds(30));
 
         // Create system msg

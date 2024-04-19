@@ -1,4 +1,4 @@
-package Chapter07.End;
+package Embeddings.End;
 
 import Utilities.Misc;
 import com.theokanning.openai.embedding.Embedding;
@@ -8,18 +8,16 @@ import com.theokanning.openai.service.OpenAiService;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 import static Utilities.Misc.Double2double;
 import static Utilities.Misc.cosineSimilarity;
 
 
 public class CompareEmbeddings {
-    private final static String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
 
     public static void main(String[] args) throws IOException {
 
-        String token = Misc.getProperty(DEFAULT_CONFIG,"chatgpt.apikey");
+        String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token);
 
         List<Embedding> one = getEmbeddingVec(service, "I like the java programming language.");

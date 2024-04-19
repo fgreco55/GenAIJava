@@ -1,9 +1,7 @@
-package Chapter04.Begin;
+package Completions.Begin;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import Utilities.Misc;
 import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 
 import java.io.IOException;
@@ -22,7 +20,6 @@ public class SimpleFileChatCompletion {
         List<String> resultsFromLLM = new ArrayList<>();  // results coming back from LLM
 
         ChatMessage userMessage;
-        String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
         String DEFAULT_DATAFILE = "./src/main/resources/mydata.txt";
         /*
          Add a useful system message
@@ -30,14 +27,7 @@ public class SimpleFileChatCompletion {
         String INSTRUCTION = "You are a ...";
         */
 
-        Properties prop = getConfigProperties(DEFAULT_CONFIG);
-        if (prop == (Properties) null) {
-            System.err.println("Cannot find properties file. Your path to the properties is probably incorrect.");
-            System.exit(1);
-        }
-        String token = prop.getProperty("chatgpt.apikey");
-
-
+        String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token, Duration.ofSeconds(30));
 
         // Create system msg

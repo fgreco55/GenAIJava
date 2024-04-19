@@ -1,5 +1,6 @@
-package Chapter04.End;
+package Completions.End;
 
+import Utilities.Misc;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -9,7 +10,6 @@ import com.theokanning.openai.service.OpenAiService;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,14 +19,7 @@ public class SimpleChatCompletion {
     public static void main(String[] args) throws IOException {
         List<String> resultsFromLLM = new ArrayList<>();  // results coming back from LLM
 
-        String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
-        Properties prop = getConfigProperties(DEFAULT_CONFIG);
-        if (prop == (Properties) null) {
-            System.err.println("Cannot find OpenAI API key.  Your path to the properties is probably incorrect.");
-            System.exit(1);
-        }
-        String token = prop.getProperty("chatgpt.apikey");
-
+        String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token, Duration.ofSeconds(30));
 
         final List<ChatMessage> messages = new ArrayList<>();

@@ -1,6 +1,7 @@
-package Chapter05.Begin;
+package Chatbot.Begin;
 
-import Chapter05.End.Chatbot;
+import Chatbot.End.Chatbot;
+import Utilities.Misc;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -12,15 +13,9 @@ public class ChatApp {
     public static void main(String[] args) throws IOException {
             Scanner userinput;                                  // user inputted line as a Scanner
             String cmdline;
-            String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
-            Properties prop = getConfigProperties(DEFAULT_CONFIG);
-            if (prop == (Properties) null) {
-                System.err.println("Cannot find OpenAI API key.  Your path to the properties is probably incorrect.");
-                System.exit(1);
-            }
-            String token = prop.getProperty("chatgpt.apikey");
+            String token = Misc.getAPIkey();
 
-            Chapter05.Begin.Chatbot cb = new Chapter05.Begin.Chatbot(token);
+            Chatbot.Begin.Chatbot cb = new Chatbot.Begin.Chatbot(token);
 
             while (true) {
 

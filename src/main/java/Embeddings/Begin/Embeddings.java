@@ -1,5 +1,6 @@
-package Chapter07.End;
+package Embeddings.End;
 
+import Utilities.Misc;
 import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.service.OpenAiService;
@@ -12,13 +13,12 @@ import java.util.Scanner;
 import static Utilities.Misc.getProperty;
 
 public class Embeddings {
-    private final static String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
 
     public static void main(String[] args) throws IOException {
 
-        String token = getProperty(DEFAULT_CONFIG, "chatgpt.apikey");
         Scanner userinput;
 
+        String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token);
 
         while (true) {

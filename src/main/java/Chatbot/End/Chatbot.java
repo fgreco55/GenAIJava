@@ -1,4 +1,4 @@
-package Chapter05.End;
+package Chatbot.End;
 
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -6,11 +6,8 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
-
-import static Utilities.Misc.getConfigProperties;
 
 public class Chatbot {
     private final List<String> asstHistory;      // history of all responses from LLM
