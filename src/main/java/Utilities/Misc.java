@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Properties;
 
 public class Misc {
+    private final static String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
+
     public static Properties getConfigProperties(String fname) throws IOException {
         Properties prop = new Properties();
         InputStream in;
@@ -27,6 +29,10 @@ public class Misc {
             System.exit(1);
         }
         return prop.getProperty(propname);
+    }
+
+    public static String getAPIkey() throws IOException {
+        return getProperty(DEFAULT_CONFIG, "chatgpt.apikey");
     }
 
     public static double[] Double2double(Double[] indouble) {
