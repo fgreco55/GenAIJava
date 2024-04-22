@@ -15,7 +15,11 @@ public class ChatApp {
             String cmdline;
             String token = Misc.getAPIkey();
 
-            Chatbot.Begin.Chatbot cb = new Chatbot.Begin.Chatbot(token);
+            /*
+             Create an instance of ChatApp
+
+            //Chatbot cb = ...
+            */
 
             while (true) {
 
@@ -25,7 +29,11 @@ public class ChatApp {
 
                 if (cmdline.isEmpty())
                     continue;
-                System.out.println(cb.getCompletion(cmdline));
+                /*
+                 Display the completion
+                   System.out.println(..getCompletion(cmdline));
+                 */
+
             }
         }
 }
