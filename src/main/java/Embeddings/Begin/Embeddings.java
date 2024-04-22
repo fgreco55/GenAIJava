@@ -36,9 +36,9 @@ public class Embeddings {
                     /* Display the embedding vector
 
                     println...
-                    */
 
                     System.out.println("Embedding vector has " + embeddings.get(0).getEmbedding().size() + " elements.");
+                    */
                 }
             }
         }
