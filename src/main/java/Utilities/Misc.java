@@ -85,4 +85,12 @@ public class Misc {
         }
         return lines;
     }
+
+    public static List<Float> Double2Float(List<Double> d) {
+            List<Float> flist = new ArrayList<>();
+            for (int i = 0; i < d.size(); i++) {
+                flist.add(d.get(i).floatValue());
+            }
+            return flist;
+        }
 }
