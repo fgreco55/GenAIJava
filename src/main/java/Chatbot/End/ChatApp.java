@@ -9,7 +9,8 @@ public class ChatApp {
             Scanner userinput;                                  // user inputted line as a Scanner
             String cmdline;
 
-            String token = Misc.getAPIkey();
+            String token = Misc.getAPIkey();                    // API key for the cloud GenAI REST service
+
             Chatbot cb = new Chatbot(token);
 
             while (true) {
