@@ -1,0 +1,1 @@
+Java Development Kit 22, the next version of Java Standard Edition, is now available as a production release.
