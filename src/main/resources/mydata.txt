@@ -1,10 +1,13 @@
+JDK 22: The new features in Java 22
 Java 22 arrives with previews of scoped values, structured concurrency, stream gatherers, and the ability to execute multi-file programs.
 Share on Facebook Share on Twitter Share on LinkedIn Share on Reddit Share by Email Print resource
 Paul KrillBy Paul Krill
 Editor at Large, InfoWorld | MAR 19, 2024 6:30 AM PDT
 
 
+Java / coffee / beans
 Jessica Lewis (CC0)
+
 
 
 
