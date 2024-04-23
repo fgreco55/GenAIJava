@@ -13,7 +13,7 @@ public class Chatbot {
     private final List<String> asstHistory;      // history of all responses from LLM
     private final List<String> promptHistory;    // history of all prompts sent to LLM
     private String instruction = "You are a extremely helpful Java expert and will respond as one.";        // additional behavior (system)
-    private String completion_format = "";  // style or language of output
+    private String completion_format = "";      // style or language of output
     private List<String> context = new ArrayList<>();
     private OpenAiService service;
 
@@ -116,30 +116,5 @@ public class Chatbot {
         // mlist.forEach(cm -> System.out.println("MSG: " + cm.getContent().toString()));
         System.out.println("+END-------------------------------------------------------+");
     }
-
-    /*public static void main(String[] args) throws IOException {
-        Scanner userinput;                                  // user inputted line as a Scanner
-        String cmdline;
-        String DEFAULT_CONFIG = "./src/main/resources/genai.properties";
-        Properties prop = getConfigProperties(DEFAULT_CONFIG);
-        if (prop == (Properties) null) {
-            System.err.println("Cannot find OpenAI API key.  Your path to the properties is probably incorrect.");
-            System.exit(1);
-        }
-        String token = prop.getProperty("chatgpt.apikey");
-
-        Chatbot cb = new Chatbot(token);
-
-        while (true) {
-
-            userinput = new Scanner(System.in);
-            System.out.print("prompt> ");
-            cmdline = userinput.nextLine();
-
-            if (cmdline.isEmpty())
-                continue;
-            System.out.println(cb.getCompletion(cmdline));
-        }
-    }*/
 }
 
