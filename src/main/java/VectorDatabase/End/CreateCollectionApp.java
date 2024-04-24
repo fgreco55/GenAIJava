@@ -14,7 +14,7 @@ public class CreateCollectionApp {
         String token = Misc.getAPIkey();                                // Connect to OpenAI
         cc.setService(new OpenAiService(token));
 
-        int ver = 3;
+        int ver = 5;
         cc.createCollection("frank" + ver, "This is test " + ver + " of my create-collection example");
         cc.insert_file("frank" + ver, "./src/main/resources/mydata.txt");
     }
