@@ -41,13 +41,21 @@ public class CreateCollection {
         this.mc = mc;
     }
 
+    public OpenAiService getService() {
+        return service;
+    }
+
+    public void setService(OpenAiService service) {
+        this.service = service;
+    }
+
     /** **************************************************************
      * connectToMilvus() - connect to a running Milvus instance
      * @param host
      * @param port
      * @return
      */
-    private MilvusServiceClient connectToMilvus(String host, int port) {
+    public MilvusServiceClient connectToMilvus(String host, int port) {
         mc = new MilvusServiceClient(
                 ConnectParam.newBuilder()
                         .withHost(host)
@@ -56,6 +64,15 @@ public class CreateCollection {
         );
         mc.setLogLevel(LogLevel.Debug);
         return mc;
+    }
+
+    /**
+     * createCollection() - convenience method for creating collections of width OPENAI_VECSIZE
+     * @param coll
+     * @param colldesc
+     */
+    public void createCollection(String coll, String colldesc) {
+        create_collection(coll, colldesc, OPENAI_VECSIZE);
     }
 
     /** **********************************************************************
@@ -205,22 +222,5 @@ public class CreateCollection {
         if (resp.getStatus() != R.Status.Success.getCode()) {
             System.err.println("***ERROR:  Cannot insert into collection.");
         }
-    }
-
-
-    /******************************************************************
-     *  main method
-     ******************************************************************/
-    public static void main(String[] args) throws IOException {
-        CreateCollection cc = new CreateCollection();
-
-        cc.setMc(cc.connectToMilvus("localhost", 19530));      // Connect to the VDB
-
-        String token = Misc.getAPIkey();                                // Connect to OpenAI
-        cc.service = new OpenAiService(token);
-
-        int ver = 3;
-        cc.create_collection("frank"+ver, "This is test " + ver + " of my create-collection example", OPENAI_VECSIZE);
-        cc.insert_file("frank"+ver, "./src/main/resources/mydata.txt");
     }
 }
