@@ -70,3 +70,413 @@ The foreign function and memory API, from Project Panama, allows Java programs t
 The foreign function and memory API previously was previewed in JDK 19, JDK 20, and JDK 21. It would be finalized in JDK 22. The latest revisions cover four areas: supporting arbitrary charsets for native strings, enabling clients to build C-language function descriptors programmatically, and introducing the Enable-Native-Access JAR-file manifest attribute. The latter allows executable JAR files to call restricted methods without having to use the —enable-native-access command-line option. The fourth area is providing a new linker option that allows clients to pass heap segments to downcall method handles.
 
 New versions of standard Java arrive every six months, and long-term support releases arrive every two years.
+
+JDK 22: A Brief Overview
+JDK 22, released in March 2024, marks a significant step forward for Java. It introduces several preview features alongside improvements to existing libraries and the garbage collector. These enhancements aim to streamline development processes, empower developers with greater control, and boost Java’s overall performance.
+
+Release Date and Support Details
+JDK 22 reached General Availability (GA) on March 19, 2024. Oracle provides production-ready binaries under the GPL(General Public License), with binaries from other vendors expected to follow shortly.
+
+The Significance of JDK 22 in the Java Ecosystem
+The Java ecosystem thrives on continuous innovation. JDK 22 plays a crucial role by:
+
+Enhancing Developer Productivity: Features like scoped values and stream gatherers simplify thread handling and stream processing, respectively.
+Improving Code Readability: Unnamed variables and patterns contribute to cleaner and more maintainable code.
+Boosting Performance: Region pinning for the G1 garbage collector optimizes memory management, leading to faster applications.
+Simplifying Concurrent Programming: Structured concurrency offers a more intuitive approach to managing concurrent tasks.
+JDK 22: New Features of Java 22
+1. Scoped Values
+Scoped values introduce a novel approach to managing shared data within a thread or across child threads. They offer several advantages over traditional thread-local variables:
+
+Immutability: Scoped values are immutable, preventing accidental modification and improving thread safety. This eliminates the need for complex synchronization mechanisms often required with thread-local variables.
+Automatic Lifecycle Management: Scoped values are automatically cleaned up when they go out of scope (typically when the thread or enclosing block exits). This simplifies memory management and reduces the risk of memory leaks associated with thread-local variables.
+Thread-Safe Sharing: Scoped values enable safe sharing of data between parent and child threads while maintaining immutability. A parent thread can create a child thread with a specific scoped value, ensuring the child thread has access to the data without modifying the original value.
+2. Stream Gatherers
+Stream gatherers provide a more efficient way to collect results from streams. They allow developers to define custom logic for accumulating data during stream processing. Unlike traditional terminal operations that return a single value, stream gatherers offer greater flexibility by enabling developers to accumulate results in various ways. For instance, a stream gatherer could be used to collect data into a specific data structure or perform custom calculations on the stream elements during the accumulation process.
+       3. Structured Concurrency
+       Structured concurrency brings a structured way for programming concurrent tasks. It treats collections of related tasks performed in separate threads as one unit of work thus simplifying management of asynchronous operations. This approach offers several benefits:
+
+       Improved Readability: Code becomes easier to understand and reason about by explicitly defining the start, execution, and completion of concurrent tasks within a structured block.
+       Streamlined Error Handling: Structured concurrency provides mechanisms for handling errors that propagate through the entire unit of work, simplifying error management in complex asynchronous operations.
+       Enhanced Cancellation: Cancellation logic can be applied to the entire unit of work, ensuring all tasks within the group are properly terminated when cancellation is requested.
+       Here’s an example of how structured concurrency can be used to download multiple files concurrently:
+
+
+       try (var executor = Executors.newFixedThreadPool(3)) {
+         List<String> urls = Arrays.asList("url1", "url2", "url3");
+
+         List<Future<String>> downloadFutures = new ArrayList<>();
+         for (String url : urls) {
+           downloadFutures.add(executor.submit(() -> downloadFile(url)));
+         }
+
+         List<String> downloadedFiles = new ArrayList<>();
+         for (Future<String> future : downloadFutures) {
+           try {
+             downloadedFiles.add(future.get());
+           } catch (Exception e) {
+             // Handle download error
+           }
+         }
+
+         // Use downloaded files
+       }
+       This code can be refactored using structured concurrency:
+
+
+       try (var executor = Executors.newFixedThreadPool(3)) {
+         List<String> urls = Arrays.asList("url1", "url2", "url3");
+
+         List<String> downloadedFiles = executor.execute(
+             () -> {
+               for (String url : urls) {
+                 downloadFile(url);
+               }
+             }
+         );
+
+         // Use downloaded files
+       }
+       4. Statements Before Super
+       Prior to JDK 22, code execution within a constructor had to occur after the super call, which initializes the parent class. This restriction often forced developers to place initialization logic within the parent class constructor or use instance initialization blocks, which could lead to code duplication or awkward workarounds. Statements Before Super relaxes this restriction, allowing developers to place essential initialization logic before invoking the superclass constructor. This enhances flexibility and control over object initialization by enabling developers to perform necessary setup tasks before delegating to the parent class constructor.
+
+       Consider a class Rectangle that inherits from a base class Shape with a constructor that sets the color:
+
+
+       public class Shape {
+         private String color;
+
+         public Shape(String color) {
+           this.color = color;
+         }
+       }
+
+       public class Rectangle extends Shape {
+         private int width;
+         private int height;
+
+         // Prior to JDK 22, initialization logic had to go here
+         public Rectangle(int width, int height, String color) {
+           super(color); // Call to superclass constructor
+           this.width = width;
+           this.height = height;
+         }
+       }
+       With statements before super, the initialization logic for width and height can be placed before the superclass constructor call:
+
+
+       public class Rectangle extends Shape {
+         private int width;
+         private int height;
+
+         public Rectangle(int width, int height, String color) {
+           this.width = width;
+           this.height = height;
+           super(color); // Call to superclass constructor after setting width and height
+         }
+       }
+       5. Class-File API
+       The Class-File API provides programmatic access to Java class files. This allows developers to inspect, modify, and generate class files at runtime. Here are some potential use cases for the Class-File API:
+
+       Bytecode Manipulation: Developers can write applications that modify the bytecode of existing classes at runtime. This can be used for techniques like code instrumentation, where additional code is inserted into a class to monitor behavior or collect performance data.
+       Custom Class Loaders: The Class-File API can be leveraged to build custom class loaders that dynamically generate or modify classes at load time. This can be beneficial for applications that require custom class loading behavior or need to adapt class definitions based on runtime conditions.
+       Metaprogramming: The ability to inspect and modify class files opens doors for advanced metaprogramming techniques. Developers can potentially write programs that generate code based on annotations or other metadata within class files.
+       6. Region Pinning for the G1 Garbage Collector (G1 GC)
+       Region pinning is a performance optimization technique for the G1 garbage collector. The G1 GC divides the heap memory into smaller regions. During garbage collection cycles, the G1 GC identifies and collects regions with a high concentration of dead objects, improving memory efficiency. Region pinning allows developers to designate specific memory regions as pinned, preventing them from being moved during garbage collection cycles. This is particularly beneficial for frequently accessed data, especially in applications with large memory footprints. Pinning these regions ensures the data remains readily available in its current location, potentially reducing memory access times and improving application performance.
+
+
+
+       7. String Templates (Second Preview)
+       String templates (still in preview) offer a convenient way to construct complex strings. They combine literal text with embedded expressions, enabling developers to create dynamic strings with improved readability compared to traditional string concatenation. Here’s how string templates work:
+
+       Template Literals: String templates utilize special delimiters (typically ${}) to mark embedded expressions within the string.
+       Expression Evaluation: During string template processing, the Java runtime engine evaluates the embedded expressions and incorporates the results into the final string.
+       Improved Readability: String templates enhance readability by clearly separating literal text from expressions. This can be particularly beneficial for complex strings that involve multiple concatenations and logic evaluations.
+       Consider the following example of constructing a greeting message using traditional string concatenation:
+
+
+       String name = "Ayaan";
+       int age = 23;
+       String greeting = "Hello, my name is " + name + " and I am " + age + " years old.";
+       This approach can become cumbersome for more complex scenarios. With string templates, the greeting message can be written more concisely and readable:
+
+
+       String name = "Ayaan";
+       int age = 23;
+       String greeting = "Hello, my name is ${name} and I am ${age} years old.";
+       8. Unnamed Variables and Patterns
+       Unnamed variables and patterns are syntactic sugar that enhance code readability. They allow developers to omit variable names when the value is not used or when patterns are employed for matching purposes only. This can be particularly beneficial in scenarios with:
+
+       Complex Conditional Statements: Unnamed variables can be used within conditional expressions where the resulting value is not explicitly assigned to a variable but rather used for comparison or logical operations.
+       Destructuring Assignments: When destructuring assignments involve elements that are not required for further processing, unnamed patterns can be used to discard those elements, improving code conciseness.
+       This article has explored some of the major features and changes introduced in JDK 22. These features aim to streamline development processes, enhance code readability, and boost overall Java performance.
+
+       To explore the complete list of features and changes in JDK 22, refer to the official documentation:
+
+       JDK 22 Release Notes: https://www.oracle.com/java/technologies/javase/22all-relnotes.html
+
+       Impact on Java Development
+       JDK 22 significantly impacts Java development by:
+
+       Reducing Boilerplate Code: Features like stream gatherers and scoped values eliminate the need for manual code to handle common tasks associated with stream processing and thread-local data management.
+       Improving Code Maintainability: Unnamed variables and patterns contribute to cleaner and more concise code, making it easier to understand and modify for both the developer who wrote it and future maintainers.
+       Enhancing Developer Productivity: The new features empower developers to write more efficient and robust code, leading to faster development cycles by reducing the time spent on complex tasks and error handling.
+       Unlocking New Possibilities: The Class-File API opens doors for advanced development techniques like bytecode manipulation and custom class loading, enabling developers to create highly specialized applications.
+       By making common development tasks easier to do, JDK 22 improves code readability and brings in powerful new capabilities that make it possible to create faster, stronger and more enjoyable Java programs.
+
+       Comparison with Previous Versions
+       JDK 22 builds upon its predecessors in several ways:
+
+       Focus on Developer Experience: Compared to previous releases, JDK 22 introduces a wider range of preview features aimed at improving developer experience. Features like scoped values, stream gatherers, and statements before super address common pain points and provide developers with more control and flexibility.
+       Enhanced Concurrency Support: Structured concurrency represents a significant step forward in Java’s approach to handling concurrent tasks. This new paradigm offers a more intuitive and manageable way to reason about asynchronous operations compared to traditional callback-based approaches found in previous versions.
+       Performance Optimization: Region pinning for G1 GC shows how Java constantly works towards maintaining high performance through targeted optimizations. Developers can adjust memory management in this way to suit specific use cases which may result in better performance when dealing with applications having larger memory footprints.
+       Exploration of New Paradigms: The inclusion of preview features like the Class-File API suggests Java’s willingness to explore new possibilities and integrate innovative approaches. This openness to exploration can pave the way for future advancements in the language.
+       Future of Java
+       The direction of Java development gleaned from JDK 22 points towards:
+
+       Growing focus on developer experience: The stress on functionality that simplifies complicated procedures and enhances code legibility implies the intention of making Java a more user-friendly language. We should expect further improvements in such areas as tooling, code analysis and debugging support.
+       Enhanced Concurrency Support: Structured concurrency is likely to play a more prominent role in future Java development. We can expect to see further refinements and potentially additional features that solidify this paradigm as the preferred approach for managing concurrent tasks.
+       Performance Optimization: Continued efforts to optimize the garbage collector and other core components will likely remain a priority. Additionally, future releases may introduce features that enable developers to profile and optimize applications more effectively.
+       Exploration of New Paradigms: Java is likely to continue exploring new language features and paradigms that address emerging development challenges. The Class-File API is an example of this exploration, and future releases may introduce features inspired by functional programming or reactive programming concepts.
+       Conclusion
+       JDK 22 represents a major milestone for Java development. These new features deliver big gains for Java programmers; from better developer productivity to improved performance. Focusing on developer experience, concurrency support and performance optimization, JDK 22 makes way for a more efficient, robust and enjoyable Java development experience. As the evolution of Java continues, developers will be able to look forward to more advancements that empower them to develop outstanding applications.
+
+The Arrival of Java 22
+March 19, 2024 | 11 minute read
+
+Sharat Chander
+Director, Java SE Product Management
+­The arrival of Java 22!
+
+Follow Java and OpenJDK on X
+
+JDK 22 is now available!
+
+Oracle is proud to announce the general availability of JDK 22 for developers, enterprises, and end-users.
+
+New with Java 22
+
+JDK 22 delivers 12 enhancements that are significant enough to warrant their own JDK Enhancement Proposals (JEPs), including seven preview features and one incubator feature.   They cover improvements to the Java Language, its APIs, its performance, and the tools included in the JDK.
+
+1) Language Improvements:
+
+Unnamed Variables & Patterns - JEP 456
+
+Improves readability when variable declarations or nested patterns are required but not used. Both are denoted by the underscore character
+
+Value:
+
+Captures developer intent that a given binding or lambda parameter is unused, and enforces that property to clarify programs and reduce opportunities for error.
+Improves the maintainability of all code by identifying variables that must be declared (e.g., in catch clauses) but are not used.
+Allows multiple patterns to appear in a single case label, if none of them declare any pattern variables.
+Improves the readability of record patterns by eliding unnecessary nested type patterns.
+1.1) Language Previews
+
+Statements before super (…) [Preview] - JEP 447:
+
+In constructors, allow for statements that do not reference the instance being created to appear before an explicit constructor invocation.
+
+Value:
+
+Gives developers greater freedom to express the behavior of constructors, enabling the more natural placement of logic that currently must be factored into auxiliary static methods, auxiliary intermediate constructors, or constructor arguments.
+Preserves the existing guarantee that constructors run in top-down order during class instantiation, ensuring that code in a subclass constructor cannot interfere with superclass instantiation.
+Does not require any changes to the Java Virtual Machine. This Java language feature relies only on the current ability of the JVM to verify and execute code that appears before explicit constructor invocations within constructors.
+String Templates (Second Preview) - JEP 459:
+
+String templates complement Java's existing string literals and text blocks by coupling literal text with embedded expressions and template processors to produce specialized results.
+
+Value:
+
+Simplifies the writing of Java programs by making it easy to express strings that include values computed at run time.
+Enhances the readability of expressions that mix text and expressions, whether the text fits on a single source line (as with string literals) or spans several source lines (as with text blocks).
+Improves the security of Java programs that compose strings from user-provided values and pass them to other systems (e.g., building queries for databases) by supporting validation and transformation of both the template and the values of its embedded expressions.
+Retains flexibility by allowing Java libraries to define the formatting syntax used in string templates.
+Simplifies the use of APIs that accept strings written in non-Java languages (e.g., SQL, XML, and JSON).
+Enables the creation of non-string values computed from literal text and embedded expressions without having to transit through an intermediate string representation.
+Implicitly Declared Classes and Instance Main Methods (Second Preview) - JEP 463:
+
+Students can write their first Java programs without needing to understand language features designed for large programs. Instead of using a separate dialect of the language, students can write streamlined declarations for single-class programs and then seamlessly expand their programs to use more advanced features as their skills grow.
+
+Value:
+
+To accelerate learning of Java -
+
+Offers a smooth on-ramp to Java programming so that instructors can introduce concepts in a gradual manner.
+Helps students to write basic programs in a concise manner and grow their code gracefully as their skills grow.
+Reduces the ceremony of writing simple programs such as scripts and command-line utilities.
+Does not introduce a separate beginners' dialect of the Java language.
+Does not introduce a separate beginners' toolchain; student programs should be compiled and run with the same tools that compile and run any Java program.
+2) Libraries
+
+Foreign Function & Memory API - JEP 454:
+
+Allows Java programs to interoperate with code and data outside of the Java runtime. By efficiently invoking foreign functions (i.e., code outside the JVM), and by safely accessing foreign memory (i.e., memory not managed by the JVM), the API enables Java programs to call native libraries and process native data without the brittleness and danger of JNI.
+
+Value:
+
+Productivity — Replace the brittle machinery of native methods and the Java Native Interface (JNI) with a concise, readable, and pure-Java API.
+Performance — Provide access to foreign functions and memory with overhead comparable to, if not better than, JNI and sun.misc.Unsafe.
+Broad platform support — Enable the discovery and invocation of native libraries on every platform where the JVM runs.
+Uniformity — Provide ways to operate on structured and unstructured data, of unlimited size, in multiple kinds of memory (e.g., native memory, persistent memory, and managed heap memory).
+Soundness — Guarantee no use-after-free bugs, even when memory is allocated and deallocated across multiple threads.
+Integrity — Allow programs to perform unsafe operations with native code and data but warn users about such operations by default.
+2.1) Library Previews and Incubator
+
+Class-File API (Preview) - JEP 457:
+
+Provides a standard API for parsing, generating, and transforming Java class files.
+
+Value:
+
+The API allows frameworks and programs that rely on it to support the latest class files from the latest JDK automatically, so that the new language and VM features with representation in class files could be adopted quickly and easily.
+Stream Gatherers (Preview) - JEP 461:
+
+Enhances the Stream API to support custom intermediate operations. This will allow stream pipelines to transform data in ways that are not easily achievable with the existing built-in intermediate operations.
+
+Value:
+
+Improves developer productivity and code readability by making common custom operations in streams more flexible and expressive. As much as possible, allows intermediate operations to manipulate streams of infinite size.
+Structured Concurrency (2nd Preview) - JEP 462:
+
+Simplifies concurrent programming. Structured concurrency treats groups of related tasks running in different threads as a single unit of work, thereby streamlining error handling and cancellation, improving reliability, and enhancing observability.
+
+Value:
+
+Simplifies development of concurrent code by promoting a style of programming that can eliminate common risks arising from cancellation and shutdown, such as thread leaks and cancellation delays, and improves the observability of concurrent code.
+Scoped Values (2nd Preview) - JEP 464:
+
+Enables efficient sharing of immutable data within and across threads.
+
+Value:
+
+Ease of use — Provides a programming model to share data both within a thread and with child threads, to simplify reasoning about data flow.
+Comprehensibility — Makes the lifetime of shared data visible from the syntactic structure of code.
+Robustness — Ensures that data shared by a caller can be retrieved only by legitimate callees.
+Performance — Treats shared data as immutable to allow sharing by a large number of threads, and to enable runtime optimizations.
+Vector API (7th Incubator) - JEP 460:
+
+An API to express vector computations that reliably compile at runtime to optimal vector instructions on supported CPU architectures, thus achieving performance superior to equivalent scalar computations.
+
+This JEP proposes to re-incubate the API in JDK 22, with minor enhancements in the API relative to JDK 21. The implementation includes bug fixes and performance enhancements. We include the following notable changes:
+
+Support vector access with heap MemorySegments that are backed by an array of any primitive element type. Previously access was limited to heap MemorySegments backed by an array of byte.
+Value:
+
+Offers a clear and concise API that is capable of clearly and concisely expressing a wide range of vector computations consisting of sequences of vector operations composed within loops, and possibly with control flow.
+The API is designed to be CPU architecture agnostic, enabling implementations on multiple architectures supporting vector instructions.
+Offers a reliable runtime compilation and performance on x64 and AArch64 architectures.
+Aligns with Project Valhalla.
+3) Performance
+
+Regional Pinning for G1 - JEP 423:
+
+Reduces latency by implementing regional pinning in G1, so that garbage collection need not be disabled during Java Native Interface (JNI) critical regions.
+
+Value:
+
+Improves developer productivity by eliminating the need for Java threads to wait before G1 GC operation to complete while using JNI.
+
+4) Tooling
+
+Launch Multi-File Source-Code Programs - JEP 458:
+
+Allows users to run a program supplied as multiple files of Java source code without first having to compile it.
+
+Value:
+
+Improves developer productivity by making the transition from small programs to larger ones more gradual, enabling developers to choose whether and when to go to the trouble of configuring a build tool.
+Note that preview features are fully specified and fully implemented Language or VM Features of the Java SE Platform, but are impermanent. They are made available in JDK Feature Releases to allow for developer feedback based on real-world uses, before them becoming permanent in a future release. This also affords tool vendors the opportunity to work towards supporting features before they are finalized into the Java SE Standard.
+
+APIs in Incubator modules put non-final APIs and non-final tools in the hands of developers and users to gather feedback that will ultimately improve the quality of the Java platform.
+
+Besides the changes described in the JEPs, there are many smaller updates listed in the release notes which will be of interest to many application developers and system administrators. These include deprecation of obsolete APIs and removal of previously deprecated ones.
+
+Some of the key updates from the Java 22 release notes:
+
+Addition of additional algorithms to keytool and jarsigner.
+Garbage collector throughput improvements especially as it relates to “young” garbage.
+Better version reporting for system module descriptors.
+Improved “wait” handling options for native code.
+Unicode Common Locale Data Repository has been updated to version 44.
+Type annotations support for types loaded from bytecode.
+ForkJoinPool and ForJoinTasks can now better handle uninterruptable tasks.
+Additional flexibility for configuring client versus server TLS connection properties.
+Improved native memory tracking including ability to report peak usage.
+Finally, like all Feature releases, JDK 22 includes hundreds of performance, stability, and security updates including adapting to underlying OS and firmware updates and standards.  Users and application developers usually benefit from these changes without noticing them.
+
+And the constant feature included in all JDK releases: Predictability
+
+JDK 22 is the 13th Feature Release delivered on time through the six-month release cadence. This level of predictability allows developers to easily manage their adoption of innovation thanks to a steady stream of expected improvements.
+
+
+
+Java’s ability to boost performance, stability, and security continues to make it the world’s most popular programming language.
+
+Oracle will not offer long-term support for JDK 22; we will provide updates until September 2024 when it will be superseded by Oracle JDK 23.
+
+Java 22, Together
+
+As with previous releases, Java 22 celebrates the contributions of many individuals and organizations in the OpenJDK Community — we all build Java, together!
+
+Oracle Releases Java 22
+New release delivers 12 JDK Enhancement Proposals to improve the Java language and enhance the development platform’s performance, stability, and security
+
+JavaOne returns to the San Francisco Bay Area in 2025
+
+Austin, Texas—March 19, 2024
+Java 22
+Oracle today announced the availability of Java 22, the latest version of the world’s number one programming language and development platform. Java 22 (Oracle JDK 22) delivers thousands of performance, stability, and security improvements to help developers increase productivity, drive innovation, and accelerate growth across their organizations. These include enhancements to the Java language, its APIs and performance, and the tools included in the Java Development Kit (JDK).
+
+“The new enhancements in Java 22 enable more developers to quickly and easily build and deliver feature-rich, scalable, and secure applications to help organizations across the globe grow their businesses,” said Georges Saab, senior vice president, Oracle Java Platform and chair, OpenJDK governing board. “By delivering enhancements that streamline application development and extend Java’s reach to make it accessible to developers of all proficiency levels, Java 22 will help drive the creation of a wide range of new applications and services for organizations and developers alike.”
+
+The latest JDK provides updates and improvements with 12 JDK Enhancement Proposals (JEPs). JDK 22 delivers language improvements from OpenJDK Project Amber (Statements before super[…], Unnamed Variables & Patterns, String Templates, and Implicitly Declared Classes and Instance Main Methods); enhancements from Project Panama (Foreign Function & Memory API and Vector API); features related to Project Loom (Structured Concurrency and Scoped Values); core libraries and tools capabilities (Class-File API, Launch Multi-File Source-Code Programs, and Stream Gatherers); and performance updates (Region Pinning for G1).
+
+“After nearly three decades, Java’s ability to support complex development tasks that span a wide range of use cases makes the platform as relevant as it has ever been,” said Arnal Dayaratna, research vice president, software development, IDC. “Java’s versatility and comprehensive toolset enables it to support the development of production-grade, mission-critical applications at scale, which positions it as a key enabling technology for innovative use cases such as generative AI.”
+
+Significant updates delivered in Java 22 are:
+
+
+Project Amber Features
+JEP 447: Statements before super(…) (Preview): Gives developers the freedom to express the behavior of constructors. By allowing statements that do not reference the instance being created to appear before an explicit constructor invocation, this feature enables a more natural placement of logic that needs to be factored into auxiliary static methods, auxiliary intermediate constructors, or constructor arguments. It also preserves the existing assurance that constructors run in top-down order during class instantiation, helping ensure that code in a subclass constructor cannot interfere with superclass instantiation. In addition, this feature does not require any changes to the Java Virtual Machine (JVM) and relies only on the current ability of the JVM to verify and execute code that appears before explicit constructor invocations within constructors.
+JEP 456: Unnamed Variables & Patterns: Helps improve developer productivity by enhancing the Java language with unnamed variables and patterns, which can be used when variable declarations or nested patterns are required but never used. This reduces opportunities for error, improves the readability of record patterns, and increases the maintainability of all code.
+JEP 459: String Templates (Second Preview): Simplifies the development of Java programs by making it easy to express strings that include values computed at run time, while also improving the security of programs that compose strings from user-provided values and pass them to other systems. Additionally, the readability of expressions mixed with text is enhanced, and non-string values computed from literal text and embedded expressions can be created without having to transit through an intermediate string representation.
+JEP 463: Implicitly Declared Classes and Instance Main Methods (Second Preview): Helps accelerate learning by offering a smooth on-ramp to Java programming to enable students to write their first programs without needing to understand language features designed for large programs. With this feature, educators can introduce concepts in a gradual manner and students can write streamlined declarations for single-class programs and seamlessly expand their programs to use more advanced features as their skills grow.
+
+Project Loom Features
+JEP 462: Structured Concurrency (Second Preview): Helps developers streamline error handling and cancellation and enhance observability by introducing an API for structured concurrency. This helps promote a style of concurrent programming that can eliminate common risks arising from cancellation and shutdown—such as thread leaks and cancellation delays—and improves the observability of concurrent code.
+JEP 464: Scoped Values (Second Preview): Helps increase ease-of-use, comprehensibility, performance, and robustness of developers’ projects by enabling the sharing of immutable data within and across threads.
+
+Project Panama Features
+JEP 454: Foreign Function & Memory API: Increases ease-of-use, flexibility, safety, and performance for developers by introducing an API to enable Java programs to interoperate with code and data outside of the Java runtime. By efficiently invoking foreign functions such as code outside the Java Virtual Machine, and by safely accessing foreign memory (i.e., memory not managed by the JVM), the new API allows Java programs to call native libraries and process native data without requiring the Java Native Interface.
+JEP 460: Vector API (Seventh Incubator): Enables developers to achieve performance superior to equivalent scalar computations by introducing an API to express vector computations that reliably compile at runtime to vector instructions on supported CPU architectures.
+
+Core Libraries & Tools Features
+JEP 457: Class-File API (Preview): Helps developers improve productivity by providing a standard API for parsing, generating, and transforming Java class files.
+JEP 458: Launch Multi-File Source-Code Programs: Enables developers to choose whether and when to configure a build tool by enhancing the Java application launcher to enable it to run a program supplied as multiple files of Java source code.
+JEP 461: Stream Gatherers (Preview): Helps developers improve productivity by enhancing the Stream API to support custom intermediate operations, which will allow stream pipelines to transform data in ways that are not easily achievable with the existing built-in intermediate operations. By making stream pipelines more flexible and expressive and allowing custom intermediate operations to manipulate streams of infinite size, this feature enables developers to become more efficient in reading, writing, and maintaining Java code.
+
+Performance Updates
+JEP 423: Region Pinning for G1: Helps reduce latency by allowing some garbage collection to happen during some native library calls that would have otherwise needed to pause the collector. This is achieved by tracking which objects need to be blocked during these native library calls and “pinning” just the regions that contain these objects. This allows garbage collection to continue normally in unpinned regions, even during what would have otherwise been a blocking native library call.
+
+The Java 22 release is the result of continuous collaboration between Oracle and other members of the worldwide Java developer community via OpenJDK and the Java Community Process (JCP). In addition to the new enhancements and features, Java 22 is supported by Java Management Service (JMS)—an Oracle Cloud Infrastructure (OCI) native service—which offers a unified console and dashboard to help organizations manage Java runtimes and applications on-premises or in any cloud. For more details on the features in Java 22, please read the Java 22 technical blog post.
+
+
+Supporting the Global Java Ecosystem with Innovation in the Cloud
+Java delivers increased performance, efficiency, innovation, and cost savings when deployed in the cloud on OCI, which is one of the first hyperscale clouds to support Java 22. By delivering Oracle Java SE, Oracle GraalVM, and the Java SE Subscription Enterprise Performance Pack free of charge on OCI, Java 22 enables developers to build and deploy applications that run faster, better, and with optimized cost-performance.
+
+The Oracle Java Universal SE Subscription is a pay-as-you-go offering that provides customers with best-in-class support. It includes triage support for the entire Java portfolio, entitlement to GraalVM, the Java SE Subscription Enterprise Performance Pack, access to the advanced features of the Java Management Service, and the flexibility to upgrade at the pace of their businesses. This helps IT organizations manage complexity, contain costs, and mitigate security risks.
+
+
+JavaOne Returns in 2025
+The flagship event for the global Java community, JavaOne, will return to the San Francisco Bay Area in 2025. Taking place from March 17-20, 2025 in Redwood Shores, California, JavaOne 2025 will give attendees the opportunity to hear about the latest Java developments and interact with Oracle’s Java experts and industry luminaries. Read more via the blog post on Inside Java here.
+
+Supporting Quotes
+“Within the dynamic ecosystem of the Java Community (TJC), Oracle’s enduring support fuels our momentum,” said Evren Tan, community lead, TJC. “As Java 22 unfolds, we are embracing an array of contemporary features that further enhance developer efficiency, bolstering our commitment to advancing Java technology in Türkiye. We also welcome Java developers worldwide to join us in TJC activities, showcasing the welcoming community spirit that keeps Java vibrant.”
+
+“Java’s popularity as a programming language, platform, and developer community continues to grow in Morocco and the African region,” said Badr El Hourari, founder and CIO, xHub. “With Java 22, I’m excited to see Oracle’s Java team focus on innovation that will help the new developers adopt Java more quickly such as with JEP 463. By simplifying the language, the on-ramp to Java becomes easier for a whole new generation of programmers. Also, here in Morocco we continue to highlight the importance of Java at the annual Devoxx Morocco conference, and we welcome all developers to attend this year’s event on October 2-4 to hear from some of the most influential global voices in the Java community.”
+
+“It amazes me to see Java 22 bundle features for all – from students to senior developers, and from adventurous Java enthusiasts to organizations looking for stability with performance,” said Mala Gupta, Java developer advocate, JetBrains. “Java is embracing a minimalist approach by continuing to reduce ceremonies around writing initial steps of code, via instance main method and implicit classes, making it easier for folks to get started learning Java. With constructor makeover (statements before super[…]), Java has proven again that it supports responsible innovation, and relaxing language constraints that existed from Java’s version 1.0 without breaking any existing code is very exciting. IntelliJ IDEA 2024.1 is ready with its support for Java 22 features to enable Java developers to use them with ease.”
+
+“The Helidon team recognized the value of virtual threads as soon as they were announced. With Helidon 4, the team rewrote the Helidon web server to natively use virtual threads, which resulted in much better performance and increased developer productivity,” said Tom Snyder, vice president of engineering, enterprise cloud native Java, Oracle. “Now with Java 22 we are seeing another performance boost for virtual threads, and these significant improvements will benefit all Helidon users.”
+
+“Seamless integration with the latest Java innovations is helping Oracle Database deliver the world’s most advanced database technologies for developing and running modern applications,” said Kuassi Mensah, director of product management, Oracle. “The Oracle Java Database Connectivity (JDBC) drivers have been rewritten to seamlessly support Java virtual threads. The combination of Java virtual threads and the new pipelined database operations in Oracle Database 23c helps improve end-to-end scalability for Java applications.”
