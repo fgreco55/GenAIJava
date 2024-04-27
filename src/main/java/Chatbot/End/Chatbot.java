@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Chatbot {
     private final List<String> asstHistory;      // history of all responses from LLM
-    private final List<String> promptHistory;    // history of all prompts sent to LLM
+    private final List<String> userHistory;    // history of all user prompts sent to LLM
     private String instruction = "You are a extremely helpful Java expert and will respond as one.";        // additional behavior (system)
     private String completion_format = "";      // style or language of output
     private List<String> context = new ArrayList<>();
@@ -20,9 +20,14 @@ public class Chatbot {
     Chatbot(String apikey) {
         service = new OpenAiService(apikey, Duration.ofSeconds(30));
         asstHistory = new ArrayList<>();
-        promptHistory = new ArrayList<>();
+        userHistory = new ArrayList<>();
     }
 
+    /**  *****************************************************************************************
+     * getCompletions() - create the prompt from the messages, get the result, adjust the histories
+     * @param prompt
+     * @return
+     */
     public List<String> getCompletions(String prompt) {
         List<String> resultsFromLLM = new ArrayList<>();  // results coming back from LLM
         List<ChatMessage> messages = new ArrayList<>();
@@ -59,26 +64,27 @@ public class Chatbot {
         }
 
         appendAsstHistory(resultsFromLLM.get(0));   // Add the Assistant (LLM) response to the Asst history
-        appendPromptHistory(prompt);                // Add the User's prompt to the Prompt history
+        appendUserHistory(prompt);                // Add the User's prompt to the Prompt history
 
         return resultsFromLLM;
     }
 
+    /**
+     * getCompletion() - convenience method to retrieve only the first completion
+     * @param prompt
+     * @return
+     */
     public String getCompletion(String prompt) {
         return getCompletions(prompt).get(0).toString();       // just the first one for now
     }
 
+    /** *************************************************************************************
+     * addContext - add the histories to the current Context
+     * @param msg
+     */
     public void addContext(List<ChatMessage> msg) {
-        addPromptHistory(msg);     // add the user prompt history
+        addUserHistory(msg);     // add the user prompt history
         addAsstHistory(msg);       // add the LLM (assistant) history
-    }
-
-    public Boolean appendAsstHistory(String asst) {
-        return this.asstHistory.add(asst);
-    }
-
-    public Boolean appendPromptHistory(String prompt) {
-        return this.promptHistory.add(prompt);
     }
 
     public void addAsstHistory(List<ChatMessage> msg) {
@@ -87,14 +93,35 @@ public class Chatbot {
             msg.add(p);
         }
     }
-
-    public void addPromptHistory(List<ChatMessage> msg) {
-        for (int i = 0; i < promptHistory.size(); i++) {
-            ChatMessage p = new ChatMessage(ChatMessageRole.USER.value(), promptHistory.get(i));
+    public void addUserHistory(List<ChatMessage> msg) {
+        for (int i = 0; i < userHistory.size(); i++) {
+            ChatMessage p = new ChatMessage(ChatMessageRole.USER.value(), userHistory.get(i));
             msg.add(p);
         }
     }
 
+    /**
+     * appendAsstHistory() - Add a string to the Assistant history
+     * @param asst
+     * @return
+     */
+    public Boolean appendAsstHistory(String asst) {
+        return this.asstHistory.add(asst);
+    }
+
+    /**
+     * appendUserHistory() - Add a string to the User history
+     * @param prompt
+     * @return
+     */
+    public Boolean appendUserHistory(String prompt) {
+        return this.userHistory.add(prompt);
+    }
+
+    /**
+     * showMesssages() - useful display of all ChatMessages in a list
+     * @param mlist
+     */
     public static void showMessages(List<ChatMessage> mlist) {
         System.out.println("+START-----------------------------------------------------+ [" + mlist.size() + "]");
         for (ChatMessage cm : mlist) {

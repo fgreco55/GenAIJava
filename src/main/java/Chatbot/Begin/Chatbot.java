@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Chatbot {
     private final List<String> asstHistory;      // history of all responses from LLM
-    private final List<String> promptHistory;    // history of all prompts sent to LLM
+    private final List<String> userHistory;    // history of all user prompts sent to LLM
     private String instruction = "You are a extremely helpful Java expert and will respond as one.";        // additional behavior (system)
     private String completion_format = "";  // style or language of output
     private List<String> context = new ArrayList<>();
@@ -19,7 +19,7 @@ public class Chatbot {
     Chatbot(String apikey) {
         service = new OpenAiService(apikey, Duration.ofSeconds(30));
         asstHistory = new ArrayList<>();
-        promptHistory = new ArrayList<>();
+        userHistory = new ArrayList<>();
     }
 
     public List<String> getCompletions(String prompt) {
@@ -81,7 +81,7 @@ public class Chatbot {
     }
 
     public void addContext(List<ChatMessage> msg) {
-        addPromptHistory(msg);     // add the user prompt history
+        addUserHistory(msg);     // add the user prompt history
         addAsstHistory(msg);       // add the LLM (assistant) history
     }
 
@@ -89,8 +89,8 @@ public class Chatbot {
         return this.asstHistory.add(asst);
     }
 
-    public Boolean appendPromptHistory(String prompt) {
-        return this.promptHistory.add(prompt);
+    public Boolean appendUserHistory(String prompt) {
+        return this.userHistory.add(prompt);
     }
 
     public void addAsstHistory(List<ChatMessage> msg) {
@@ -100,9 +100,9 @@ public class Chatbot {
         }
     }
 
-    public void addPromptHistory(List<ChatMessage> msg) {
-        for (int i = 0; i < promptHistory.size(); i++) {
-            ChatMessage p = new ChatMessage(ChatMessageRole.USER.value(), promptHistory.get(i));
+    public void addUserHistory(List<ChatMessage> msg) {
+        for (int i = 0; i < userHistory.size(); i++) {
+            ChatMessage p = new ChatMessage(ChatMessageRole.USER.value(), userHistory.get(i));
             msg.add(p);
         }
     }
