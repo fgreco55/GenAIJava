@@ -27,7 +27,7 @@ public class MostSimilar {
          */
 
         // Read file of strings into a list
-        List<String> fstrings = fileToList(DEFAULT_DATA);
+        List<String> fstrings = fileToListStrings(DEFAULT_DATA);
 
        /* Iterate thru List and output the strings that are N% similar
         for (String fs : fstrings) {
