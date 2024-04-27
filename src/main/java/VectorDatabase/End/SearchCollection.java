@@ -1,6 +1,5 @@
 package VectorDatabase.End;
 
-import Utilities.Misc;
 import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.service.OpenAiService;
@@ -12,9 +11,7 @@ import io.milvus.param.collection.LoadCollectionParam;
 import io.milvus.param.dml.SearchParam;
 import io.milvus.response.SearchResultsWrapper;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
