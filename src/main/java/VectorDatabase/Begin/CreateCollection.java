@@ -187,7 +187,8 @@ public class CreateCollection {
      * @param fname
      */
     public void insert_file(String collname, String fname) {
-        List<String> sents = Misc.fileToList(fname);        // list of strings from a file
+        List<String> sents = Misc.fileToListStrings(fname);        // list of strings from a file
+        //List<String> sents = Misc.fileToListParagraphs(fname);       // list of paragraphs from a file
 
         List<Long> ilist = new ArrayList<>();               // sentence ids - just a running count
         List<String> filesentences = new ArrayList<>();     // sentences to be inserted
