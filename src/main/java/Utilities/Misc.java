@@ -1,8 +1,10 @@
 package Utilities;
 
 import java.io.*;
+import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 public class Misc {
@@ -73,7 +75,20 @@ public class Misc {
         }
     }
 
-    public static List<String> fileToList(String fname) {
+    public static List<Float> Double2Float(List<Double> d) {
+        List<Float> flist = new ArrayList<>();
+        for (int i = 0; i < d.size(); i++) {
+            flist.add(d.get(i).floatValue());
+        }
+        return flist;
+    }
+
+    /**
+     * fileToListStrings() - read a text file into a List of Strings
+     * @param fname
+     * @return
+     */
+    public static List<String> fileToListStrings(String fname) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(fname))) {
             String line;
@@ -86,11 +101,79 @@ public class Misc {
         return lines;
     }
 
-    public static List<Float> Double2Float(List<Double> d) {
-            List<Float> flist = new ArrayList<>();
-            for (int i = 0; i < d.size(); i++) {
-                flist.add(d.get(i).floatValue());
+    /**
+     * fileToListSentences() - Convert a text file into a List of Sentence Strings
+     * @param fname
+     * @return
+     */
+    public static List<String> fileToListSentences(String fname) {
+        List<String> sentList = new ArrayList<>();
+
+        List<String> fs = fileToListStrings(fname);
+        for (String s : fs) {
+            for (String sn : stringToSentences(s)) {
+                if (sn.isBlank() || sn.isEmpty())
+                    continue;
+                else
+                    sentList.add(sn);
             }
-            return flist;
         }
+        return sentList;
+    }
+
+    /**
+     * stringToParagraph() - parse a string into a List of paragraphs (strings)
+     * @param text
+     * @return
+     */
+    public static List<String> stringToParagraphs(String text) {
+        List<String> paragraphs = new ArrayList<>();
+        if (text == null)
+            return paragraphs;
+
+        String[] parsedString = text.split("\\n\\s*\\n");
+        for (String s : parsedString) {
+            paragraphs.add(s.trim());
+        }
+        return paragraphs;
+    }
+
+    public static List<String> fileToListParagraphs(String fname) {
+        List<String> chunkList = new ArrayList<>();
+
+        List<String> fs = fileToListStrings(fname);
+
+        for(String s : fs) {
+               List<String> ls = stringToParagraphs(s);
+               for(String ts : ls) {
+                   chunkList.add(ts);
+               }
+        }
+        return chunkList;
+    }
+
+    /**
+     * stringToSentences() - parse a string into a List of Sentences (strings)
+     * @param text
+     * @return
+     */
+    static List<String> stringToSentences(String text) {
+        List<String> sentences = new ArrayList<>();
+        if (text == null)
+            return sentences;
+
+        // Create a BreakIterator for sentence tokenization
+        BreakIterator sentenceIterator = BreakIterator.getSentenceInstance(Locale.US);
+        sentenceIterator.setText(text);
+
+        // Iterate through sentences and output them one at a time
+        int start = sentenceIterator.first();
+
+        for (int end = sentenceIterator.next(); end != BreakIterator.DONE; start = end, end = sentenceIterator.next()) {
+            String s = text.substring(start, end).trim();
+            //System.out.println("* " + s);
+            sentences.add(s);
+        }
+        return sentences;
+    }
 }
