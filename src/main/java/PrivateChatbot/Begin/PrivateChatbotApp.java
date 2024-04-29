@@ -11,7 +11,6 @@ public class PrivateChatbotApp {
         String cmdline;
 
         String token = Misc.getAPIkey();                    // API key for the cloud GenAI REST service
-
         /*
          Step 1 - Create an instance of PrivateChatbot
 
