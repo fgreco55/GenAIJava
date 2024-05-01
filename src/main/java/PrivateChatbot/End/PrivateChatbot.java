@@ -342,6 +342,21 @@ public class PrivateChatbot {
     }
 
     /**
+     * searchDB() - convenience method - search for "max" matches on a string in collection "coll"
+     *
+     * @param coll   Name of the collection
+     * @param target Find matches based on this string
+     * @param max    At most return this many matches
+     * @return
+     */
+    public List<String> searchDB(String coll, String target, int max) {
+        List<List<Float>> smallvec = new ArrayList<>();
+        smallvec.add(sendEmbeddingRequest(target));
+
+        return searchDB_using_targetvectors(coll, smallvec, max);   // Give me at most max best matches
+    }
+
+    /**
      * sendEmbeddingRequest() - get an embedding vector and convert to List<Float> for Milvus
      *
      * @param msg
@@ -363,20 +378,5 @@ public class PrivateChatbot {
             results.add(newb.get(i));
         }
         return results;
-    }
-
-    /**
-     * searchDB() - convenience method - search for "max" matches on a string in collection "coll"
-     *
-     * @param coll   Name of the collection
-     * @param target Find matches based on this string
-     * @param max    At most return this many matches
-     * @return
-     */
-    public List<String> searchDB(String coll, String target, int max) {
-        List<List<Float>> smallvec = new ArrayList<>();
-        smallvec.add(sendEmbeddingRequest(target));
-
-        return searchDB_using_targetvectors(coll, smallvec, max);   // Give me at most max best matches
     }
 }
