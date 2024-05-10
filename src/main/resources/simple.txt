@@ -2,4 +2,5 @@ Java Development Kit 22, the next version of Java Standard Edition, is now avail
 JavaOne returns to the San Francisco Bay Area in 2025
 
 The latest JDK provides updates and improvements with 12 JDK Enhancement Proposals (JEPs). JDK 22 delivers language improvements from OpenJDK Project Amber (Statements before super[…], Unnamed Variables & Patterns, String Templates, and Implicitly Declared Classes and Instance Main Methods); enhancements from Project Panama (Foreign Function & Memory API and Vector API); features related to Project Loom (Structured Concurrency and Scoped Values); core libraries and tools capabilities (Class-File API, Launch Multi-File Source-Code Programs, and Stream Gatherers); and performance updates (Region Pinning for G1).
-
+There is plenty of pizza for the party.
+I enjoy good coffee.
