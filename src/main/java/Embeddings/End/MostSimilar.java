@@ -38,10 +38,10 @@ public class MostSimilar {
             Double[] fd = fsvec.toArray(new Double[0]);
 
             double similarity = cosineSimilarity(Double2double(emb1d), Double2double(fd));
-            similarities.add(similarity);
+            similarities.add(1d - similarity);
         }
 
-        Collections.sort(similarities);
+        Collections.sort(similarities);     // remember sort() sorts in ascending order
         System.out.println(similarities);
     }
 
