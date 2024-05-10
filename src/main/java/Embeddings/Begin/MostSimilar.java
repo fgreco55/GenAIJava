@@ -44,14 +44,14 @@ public class MostSimilar {
              Step 2 - get the cosine similarity between this string and the user's prompt
 
             double similarity = cosineSimilarity(...);
-            similarities.add(similarity);
+            similarities.add(...distance...);
             */
         }
 
         /*
           Step 4 - sort the similarities and display the sorted list
 
-        Collections.sort(...);
+        Collections.sort(...);          // remember sort() sorts in ascending order
         System.out.println(similarities);
         */
     }
