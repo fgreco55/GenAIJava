@@ -20,16 +20,17 @@ public class CompareEmbeddings {
         String token = Misc.getAPIkey();
         OpenAiService service = new OpenAiService(token);
 
-        List<Embedding> one = getEmbeddingVec(service, "I like the Java programming language.");
+        List<Embedding> one = getEmbeddingVec(service, "I like the java programming language.");
         List<Double> emb1 = one.get(0).getEmbedding();
         Double[] emb1d = emb1.toArray(new Double[0]);   // convert from List to array of Doubles for cosineSimilarity()
 
-        List<Embedding> two = getEmbeddingVec(service, "Java is a programming language.");
+        List<Embedding> two = getEmbeddingVec(service, "I enjoy programming in Java.");
         List<Double> emb2 = two.get(0).getEmbedding();
         Double[] emb2d = emb2.toArray(new Double[0]);
 
         double similarity = cosineSimilarity(Double2double(emb1d), Double2double(emb2d));
         System.out.println("Cosine Similarity: " + similarity);
+        System.out.println("Cosine Distance: " + (1 - similarity));
     }
 
     public static List<Embedding> getEmbeddingVec(OpenAiService service, String input) {
