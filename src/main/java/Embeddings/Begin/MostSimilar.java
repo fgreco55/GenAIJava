@@ -54,6 +54,12 @@ public class MostSimilar {
         Collections.sort(...);          // remember sort() sorts in ascending order
         System.out.println(similarities);
         */
+
+        /*
+          Stept 5 - optional - show top N most-similar
+
+          showtop(similarities, 3);
+         */
     }
 
     public static List<Embedding> getEmbeddingVec(OpenAiService service, String input) {
@@ -64,5 +70,12 @@ public class MostSimilar {
 
         List<Embedding> embeddings = service.createEmbeddings(embeddingRequest).getData();
         return embeddings;
+    }
+
+    public static void showtop(List<Double> sim, int max) {
+        System.out.println("Top " + max + " =====================");
+        /*
+         Show only "max" number of similarities...
+         */
     }
 }
