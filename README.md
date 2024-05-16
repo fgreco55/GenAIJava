@@ -1,5 +1,4 @@
-#GenAIJava
-
+#INTRODUCTION TO GENAI FOR JAVA DEVELOPERS
 This repo is a companion to the "Introduction to GenAI for Java Developers" course by Frank Greco.
 
 ##GOALS OF THE COURSE
