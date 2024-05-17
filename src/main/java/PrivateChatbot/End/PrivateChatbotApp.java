@@ -13,7 +13,6 @@ public class PrivateChatbotApp {
 
            PrivateChatbot pcb = new PrivateChatbot(token,
                    "frank5",    // The specific collection associated with this PCB (has to exist)
-                   //.6f,                 // Return reasonably similar RAG results
                    5,                   // At most return this many results from the VDB
                    "You are a extremely helpful Java expert and will respond as one");
 
