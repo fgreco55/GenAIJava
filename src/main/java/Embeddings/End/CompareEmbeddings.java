@@ -24,7 +24,7 @@ public class CompareEmbeddings {
         List<Double> emb1 = one.get(0).getEmbedding();
         Double[] emb1d = emb1.toArray(new Double[0]);   // convert from List to array of Doubles for cosineSimilarity()
 
-        List<Embedding> two = getEmbeddingVec(service, "I enjoy programming in Java.");
+        List<Embedding> two = getEmbeddingVec(service, "Pineapple does not belong on pizza.");
         List<Double> emb2 = two.get(0).getEmbedding();
         Double[] emb2d = emb2.toArray(new Double[0]);
 
