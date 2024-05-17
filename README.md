@@ -6,7 +6,7 @@ Empower Java software developers with the foundational knowledge, concepts, and 
 
 We will use a collection of software tools and GenAI APIs in this course, but the information and techniques learned can be applied to other tools, LLMs, and APIs.
 
-We'll learn how to create a Chatbot from scratch. Machine Learning is more than just Chatbots. Learning about ChatBots helps you understand GenAI foundations.  
+We'll learn how to create a Chatbot from scratch. Even though Machine Learning is more than just Chatbots, learning about Chatbots helps you understand GenAI foundations.  
 
 
 ## PREREQUISITES
