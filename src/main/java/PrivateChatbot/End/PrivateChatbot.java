@@ -27,7 +27,7 @@ public class PrivateChatbot {
     private String collection;
     private int numMatches = 5;
     private float radius = .5f;                 // "average" similarity is the minimum returned
-    private String completion_format = "";      // style or language of output
+    private String completion_format = "Please respond in italiano";      // style or language of output
     private List<String> context = new ArrayList<>();
     private OpenAiService service;
     private MilvusServiceClient mc;
@@ -134,7 +134,7 @@ public class PrivateChatbot {
         messages.add(userMessage);
 
         // step 4 - specify the output format
-        final ChatMessage format = new ChatMessage(ChatMessageRole.USER.value(), completion_format);
+        final ChatMessage format = new ChatMessage(ChatMessageRole.SYSTEM.value(), completion_format);
         messages.add(format);
 
         showMessages(messages);     // Just to show the whole prompt sent to the LLM
