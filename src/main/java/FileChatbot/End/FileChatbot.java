@@ -21,7 +21,7 @@ public class FileChatbot {
     private final List<String> userHistory;      // history of all prompts sent to LLM
     private List<String> files;                  // filenames of files that contain related information
     private String instruction = "You are a well-respected Java expert and will respond as one.";        // additional behavior (system)
-    private String completion_format = "Respond in italiano";      // style or language of output
+    private String completion_format = "Please respond in Hindi";      // style or language of output
     private List<String> context = new ArrayList<>();
     private OpenAiService service;
 
@@ -84,10 +84,11 @@ public class FileChatbot {
 
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
                 .builder()
-                .model("gpt-3.5-turbo")
+                //.model("gpt-3.5-turbo")
+                .model("gpt-4o")
                 .messages(messages)
                 .n(1)
-                .maxTokens(256)
+                .maxTokens(1000)
                 .build();
 
         List<ChatCompletionChoice> completions = service.createChatCompletion(chatCompletionRequest).getChoices();
