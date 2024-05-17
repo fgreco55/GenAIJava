@@ -11,7 +11,7 @@ import io.milvus.param.collection.ShowCollectionsParam;
 
 public class ListCollections {
     private MilvusServiceClient mc;
-    static final String COLLECTION_TO_DROP = "temp";
+    static final String COLLECTION_TO_DROP = "frank5";
 
     public MilvusServiceClient getMc() {
         return mc;
