@@ -13,7 +13,7 @@ public class Chatbot {
     private final List<String> asstHistory;      // history of all responses from LLM
     private final List<String> userHistory;    // history of all user prompts sent to LLM
     private String instruction = "You are a extremely helpful Java expert and will respond as one.";        // additional behavior (system)
-    private String completion_format = "";      // style or language of output
+    private String completion_format = "Please respond in Tamil";      // style or language of output
     private List<String> context = new ArrayList<>();
     private OpenAiService service;
 
@@ -44,7 +44,7 @@ public class Chatbot {
         messages.add(userMessage);
 
         // step 4 - specify the output format
-        final ChatMessage format = new ChatMessage(ChatMessageRole.USER.value(), completion_format);
+        final ChatMessage format = new ChatMessage(ChatMessageRole.SYSTEM.value(), completion_format);
         messages.add(format);
 
         showMessages(messages);     // Just to show the whole prompt sent to the LLM
@@ -54,17 +54,20 @@ public class Chatbot {
                 .model("gpt-3.5-turbo")
                 .messages(messages)
                 .n(1)
-                .maxTokens(128)
+                .maxTokens(5000)
                 .build();
 
+        // Get the completions from the LLM
         List<ChatCompletionChoice> completions = service.createChatCompletion(chatCompletionRequest).getChoices();
 
+        // Collect all the completions into a List
         for (ChatCompletionChoice s : completions) {
             resultsFromLLM.add(s.getMessage().getContent().trim());
         }
 
         appendAsstHistory(resultsFromLLM.get(0));   // Add the Assistant (LLM) response to the Asst history
-        appendUserHistory(prompt);                // Add the User's prompt to the Prompt history
+                                                    // For this example, just add the 1st completion to the Asst history
+        appendUserHistory(prompt);                  // Add the User's prompt to the Prompt history
 
         return resultsFromLLM;
     }
@@ -83,7 +86,7 @@ public class Chatbot {
      * @param msg
      */
     public void addContext(List<ChatMessage> msg) {
-        addUserHistory(msg);     // add the user prompt history
+        addUserHistory(msg);       // add the user prompt history
         addAsstHistory(msg);       // add the LLM (assistant) history
     }
 
