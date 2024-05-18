@@ -206,30 +206,4 @@ public class FileChatbot {
         // mlist.forEach(cm -> System.out.println("MSG: " + cm.getContent().toString()));
         System.out.println("+END-------------------------------------------------------+");
     }
-
-
-
-    /**
-     * sendEmbeddingRequest() - get an embedding vector and convert to List<Float> for Milvus
-     *
-     * @param msg
-     * @return
-     */
-    public List<Float> sendEmbeddingRequest(String msg) {
-
-        List<Float> results = new ArrayList<>();
-        EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                .model("text-embedding-3-small")
-                .input(Collections.singletonList(msg))
-                .build();
-
-        List<Embedding> embedding = getService().createEmbeddings(embeddingRequest).getData();
-        List<Double> emb = embedding.get(0).getEmbedding();     // OpenAI returns Doubles... Milvus wants Floats...
-        List<Float> newb = Double2Float(emb);
-        int size = embedding.get(0).getEmbedding().size();
-        for (int i = 0; i < size; i++) {
-            results.add(newb.get(i));
-        }
-        return results;
-    }
 }
