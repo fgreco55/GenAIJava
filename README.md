@@ -2,9 +2,13 @@
 This repo is a companion to the "Introduction to GenAI for Java Developers" course by Frank Greco.
 
 ## GOALS OF THE COURSE
-Empower Java software developers with the foundational knowledge, concepts, and basic skills needed to responsibly harness the capabilities of generative AI tools for various aspects of the overall production software process.
+Empower Java software developers with the foundational knowledge, concepts, and basic skills needed to responsibly 
+harness the capabilities of generative AI tools for various aspects of the overall production software process.
+This course is focused on learning the fundamentals of AI/ML, primarily generative AI by
+using Java tools.
 
-We will use a collection of software tools and GenAI APIs in this course, but the information and techniques learned can be applied to other tools, LLMs, and APIs.
+We will use a collection of software and GenAI APIs in this course, but the information and techniques 
+learned can be applied to other ML tools, LLMs, and APIs.
 
 We'll learn how to create a Chatbot from scratch. Even though Machine Learning is more than just Chatbots, learning about Chatbots helps you understand GenAI foundations.  
 
@@ -21,6 +25,7 @@ We'll learn how to create a Chatbot from scratch. Even though Machine Learning i
 * MacOS 10.14+, Windows 10/11 with WSL 2, Linux
 * IDE (in-class examples will use IntelliJ, but others can be used)
 * OpenAI account and API key [see below]
+* LangChain4j
 * Docker Desktop (Mac/Windows), Docker 19 (Linux)
 * Milvus vector db [see below]
 
