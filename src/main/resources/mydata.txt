@@ -1,19 +1,4 @@
-JDK 22: The new features in Java 22
-Java 22 arrives with previews of scoped values, structured concurrency, stream gatherers, and the ability to execute multi-file programs.
-Share on Facebook Share on Twitter Share on LinkedIn Share on Reddit Share by Email Print resource
-Paul KrillBy Paul Krill
-Editor at Large, InfoWorld | MAR 19, 2024 6:30 AM PDT
-
-
-Java / coffee / beans
-Jessica Lewis (CC0)
-
-
-
-
-
-
-Java Development Kit 22, the next version of Java Standard Edition, is now available as a production release. JDK 22 includes 12 features, with a second preview of scoped values and a preview of stream gatherers being the last additions.
+As of March 19, 2024, Java Development Kit 22 (JDK 22), the next version of Java Standard Edition, is now available as a production release. JDK 22 includes 12 features, with a second preview of scoped values and a preview of stream gatherers being the last additions.
 
 Downloadable from oracle.com, JDK 22 is a short-term release that will receive Premier support from Oracle for six months. Long-term support releases such as predecessor JDK 21 receive five years of Premier support. Extended support is available for JDK 21 until September 2031.
 
@@ -241,12 +226,6 @@ Stream gatherers provide a more efficient way to collect results from streams. T
        Conclusion
        JDK 22 represents a major milestone for Java development. These new features deliver big gains for Java programmers; from better developer productivity to improved performance. Focusing on developer experience, concurrency support and performance optimization, JDK 22 makes way for a more efficient, robust and enjoyable Java development experience. As the evolution of Java continues, developers will be able to look forward to more advancements that empower them to develop outstanding applications.
 
-The Arrival of Java 22
-March 19, 2024 | 11 minute read
-
-Sharat Chander
-Director, Java SE Product Management
-­The arrival of Java 22!
 
 Follow Java and OpenJDK on X
 
