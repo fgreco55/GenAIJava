@@ -1,59 +1,55 @@
 package Embeddings.Begin;
 
 import Utilities.Misc;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
+
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-public class Embeddings {
+
+public class Embeddings{
 
     public static void main(String[] args) throws IOException {
 
         Scanner userinput;
 
+        /*
+         Get the key and create the embedding model
+
         String token = Misc.getAPIkey();
-        OpenAiService service = new OpenAiService(token);
+        EmbeddingModel model = OpenAiEmbeddingModel.withApiKey(...);
+        */
 
         while (true) {
             System.out.print("String to Embed> ");
-            userinput = new Scanner(System.in);
+            userinput = new java.util.Scanner(System.in);
 
             if (userinput.hasNextLine()) {
                 String cmd = userinput.nextLine();
                 if (!cmd.isEmpty()) {
-
                     /*
-                      Get Embedding vector from embeddings service
+                     Get the embedding vector for the user's input
 
-                    List<Embedding> embeddings = ...
+                    List<Float> embeddings = getEmbeddingVec(..., ...);
                     */
 
-                    /* Display the embedding vector
+                    /*
+                    Show the embeddings and it's length
 
-                    println...
-
-                    System.out.println("Embedding vector has " + embeddings.get(0).getEmbedding().size() + " elements.");
+                    System.out.println(embeddings);
+                    System.out.println("Embedding vector has " + embeddings.size() + " elements.");
                     */
                 }
             }
         }
     }
 
-    public static List<Embedding> getEmbeddingVec(OpenAiService service, String input) {
-
-        EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                .model("text-embedding-3-small")
-                .input(Collections.singletonList(input))
-                .build();
-
-        List<Embedding> embeddings = service.createEmbeddings(embeddingRequest).getData();
-
-        return embeddings;
+    public static List<Float> getEmbeddingVec(EmbeddingModel model, String input) {
+        Response<dev.langchain4j.data.embedding.Embedding> response = model.embed(input);
+        return response.content().vectorAsList();
     }
 }
-

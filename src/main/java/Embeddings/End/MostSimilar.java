@@ -4,6 +4,9 @@ import Utilities.Misc;
 import com.theokanning.openai.embedding.Embedding;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.service.OpenAiService;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,28 +20,24 @@ public class MostSimilar {
 
     public static void main(String[] args) throws IOException {
 
-        OpenAiService service = new OpenAiService(Misc.getAPIkey());
-
         // Get a string from the user and retrieve its embedding vector
-        List<Embedding> one = getEmbeddingVec(service, "I am interested in Java 22, reliability, and structured concurrency.");
-        List<Double> emb1 = one.get(0).getEmbedding();
-        Double[] emb1d = emb1.toArray(new Double[0]);
+        String token = Misc.getAPIkey();
+        EmbeddingModel model = OpenAiEmbeddingModel.withApiKey(token);
+
+        List<Float> one = getEmbeddingVec(model, "I am interested in Java 22, reliability, and structured concurrency.");
 
         // Read file of strings into a list
         List<String> fstrings = fileToListStrings(DEFAULT_DATA);
-        List<Double> similarities = new ArrayList<>();
-        
+        List<Float> similarities = new ArrayList<>();
+
         // Iterate thru List and calculate the cosine similarity for each line in the file compared to the user's input
         for (String fs : fstrings) {
-            if (fs.length() == 0)
+            if (fs.length() == 0)           // skip empty lines
                 continue;
 
-            List<Embedding> fsembedding = getEmbeddingVec(service, fs);
-            List<Double> fsvec = fsembedding.get(0).getEmbedding();
-            Double[] fd = fsvec.toArray(new Double[0]);
-
-            double similarity = cosineSimilarity(Double2double(emb1d), Double2double(fd));
-            similarities.add(1d - similarity);
+            List<Float> fsembedding = getEmbeddingVec(model, fs);
+            double similarity = cosineSimilarity(FloatList2doubleArray(one), FloatList2doubleArray(fsembedding));
+            similarities.add(1 - (float) similarity);     // Save the cosine similarities for sorting later
         }
 
         Collections.sort(similarities);     // remember sort() sorts in ascending order
@@ -47,19 +46,14 @@ public class MostSimilar {
         showtop(similarities, 3);
     }
 
-    public static List<Embedding> getEmbeddingVec(OpenAiService service, String input) {
-        EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                .model("text-embedding-3-small")
-                .input(Collections.singletonList(input))
-                .build();
-
-        List<Embedding> embeddings = service.createEmbeddings(embeddingRequest).getData();
-        return embeddings;
+    public static List<Float> getEmbeddingVec(EmbeddingModel model, String input) {
+        Response<dev.langchain4j.data.embedding.Embedding> response = model.embed(input);
+        return response.content().vectorAsList();
     }
 
-    public static void showtop(List<Double> sim, int max) {
+    public static void showtop(List<Float> sim, int max) {
         System.out.println("Top " + max + " =====================");
-        for(int i = 0; i < max; i++) {
+        for (int i = 0; i < max; i++) {
             System.out.println(sim.get(i));
         }
     }

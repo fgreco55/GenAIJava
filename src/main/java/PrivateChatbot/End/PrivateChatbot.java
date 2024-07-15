@@ -1,12 +1,16 @@
 package PrivateChatbot.End;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.common.clientenum.ConsistencyLevelEnum;
 import io.milvus.grpc.SearchResults;
@@ -27,16 +31,25 @@ public class PrivateChatbot {
     private String collection;
     private int numMatches = 5;
     private float radius = .5f;                 // "average" similarity is the minimum returned
-    private String completion_format = "Please respond in italiano";      // style or language of output
+    private String completion_format = "Please respond in english";      // style or language of output
     private List<String> context = new ArrayList<>();
-    private OpenAiService service;
     private MilvusServiceClient mc;
     static final String FIELD1 = "sentence_id";          // chunk identifier - we're using sentences.  Could be other chunk types
     static final String FIELD2 = "sentence_text";       // actual sentence - retrieved later to be sent to the LLM
     static final String FIELD3 = "sentence_vector";     // the embedding vector
+    private ChatLanguageModel cmodel;
+    private EmbeddingModel emodel;
 
     PrivateChatbot(String apikey) {
-        service = new OpenAiService(apikey, Duration.ofSeconds(30));
+        cmodel = OpenAiChatModel.builder()
+                .apiKey(apikey)
+                .modelName(OpenAiChatModelName.GPT_4_O)
+                .temperature(0.3)
+                .timeout(Duration.ofSeconds(30))
+                .maxTokens(512)
+                .build();
+        emodel = OpenAiEmbeddingModel.withApiKey(apikey);
+
         mc = connectToMilvus("localhost", 19530);
         asstHistory = new ArrayList<>();
         userHistory = new ArrayList<>();
@@ -87,14 +100,6 @@ public class PrivateChatbot {
         this.mc = mc;
     }
 
-    public OpenAiService getService() {
-        return service;
-    }
-
-    public void setService(OpenAiService service) {
-        this.service = service;
-    }
-
     public String getInstruction() {
         return instruction;
     }
@@ -123,38 +128,29 @@ public class PrivateChatbot {
         List<ChatMessage> messages = new ArrayList<>();
 
         // step 1 - how to behave
-        ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), instruction);
-        messages.add(systemMessage);
+        SystemMessage sysmsg = new SystemMessage(instruction);
+        messages.add(sysmsg);
 
         // step 2 - prepend context (user and assistant msgs)
         addContext(prompt, messages);
 
         // step 3 - add the user's actual prompt
-        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
-        messages.add(userMessage);
+        UserMessage usermsg = new UserMessage(prompt);
+        messages.add(usermsg);
 
         // step 4 - specify the output format
-        final ChatMessage format = new ChatMessage(ChatMessageRole.SYSTEM.value(), completion_format);
+        SystemMessage format = new SystemMessage(completion_format);
         messages.add(format);
 
-        showMessages(messages);     // Just to show the whole prompt sent to the LLM
+        //showMessages(messages);     // Just to show the whole prompt sent to the LLM
 
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
-                .builder()
-                .model("gpt-3.5-turbo")
-                .messages(messages)
-                .n(1)
-                .maxTokens(256)
-                .build();
+        Response<AiMessage> answer = cmodel.generate(messages);
+        System.out.println(answer.content().text());        // text() eliminates the 'noise' results
 
-        List<ChatCompletionChoice> completions = service.createChatCompletion(chatCompletionRequest).getChoices();
+        resultsFromLLM.add(answer.content().text());
 
-        for (ChatCompletionChoice s : completions) {
-            resultsFromLLM.add(s.getMessage().getContent().trim());
-        }
-
-        appendAsstHistory(resultsFromLLM.get(0));   // Add the Assistant (LLM) response to the Asst history
-        appendUserHistory(prompt);                // Add the User's prompt to the Prompt history
+        appendAsstHistory(answer.content().text());   // Add the Assistant (LLM) response to the Asst history
+        appendUserHistory(prompt);                  // Add the User's prompt to the Prompt history
 
         return resultsFromLLM;
     }
@@ -166,7 +162,8 @@ public class PrivateChatbot {
      * @return
      */
     public String getCompletion(String prompt) {
-        return getCompletions(prompt).get(0).toString();       // just the first one for now
+        // Looks like Langchain4J does not give you access to OpenAI's multiple completion requests
+        return getCompletions(prompt).get(0);
     }
 
     /**
@@ -183,20 +180,20 @@ public class PrivateChatbot {
 
     public void addRAGDataToMsg(List<ChatMessage> msg, List<String> strmatches) {
         for (String s : strmatches) {
-            msg.add(new ChatMessage(ChatMessageRole.USER.value(), s));
+            msg.add(new UserMessage(s));
         }
     }
 
     public void addAsstHistory(List<ChatMessage> msg) {
         for (int i = 0; i < asstHistory.size(); i++) {
-            ChatMessage p = new ChatMessage(ChatMessageRole.ASSISTANT.value(), asstHistory.get(i));
+            ChatMessage p = new AiMessage(asstHistory.get(i));
             msg.add(p);
         }
     }
 
     public void addUserHistory(List<ChatMessage> msg) {
         for (int i = 0; i < userHistory.size(); i++) {
-            ChatMessage p = new ChatMessage(ChatMessageRole.USER.value(), userHistory.get(i));
+            ChatMessage p = new UserMessage(userHistory.get(i));
             msg.add(p);
         }
     }
@@ -229,22 +226,14 @@ public class PrivateChatbot {
     public static void showMessages(List<ChatMessage> mlist) {
         System.out.println("+START-----------------------------------------------------+ [" + mlist.size() + "]");
         for (ChatMessage cm : mlist) {
-            switch (cm.getRole()) {
-                case "system":
-                    System.out.println("SYSTEM: " + cm.getContent().toString());
-                    break;
-                case "user":
-                    System.out.println("  USER: " + cm.getContent().toString());
-                    break;
-                case "assistant":
-                    System.out.println("  ASST: " + cm.getContent().toString());
-                    break;
-                default:
-                    System.out.println("UNDEFINED ROLE!!!!");
-                    break;
+            switch (cm.type()) {
+                case SYSTEM -> System.out.println("SYSTEM: " + cm.text());
+                case USER -> System.out.println("  USER: " + cm.text());
+                case AI -> System.out.println("  ASST: " + cm.text());
+                default -> System.out.println("UNDEFINED ROLE!!!!");
             }
         }
-        // mlist.forEach(cm -> System.out.println("MSG: " + cm.getContent().toString()));
+        //mlist.forEach(cm -> System.out.println("MSG: " + cm.text()));
         System.out.println("+END-------------------------------------------------------+");
     }
 
@@ -364,7 +353,10 @@ public class PrivateChatbot {
      */
     public List<Float> sendEmbeddingRequest(String msg) {
 
-        List<Float> results = new ArrayList<>();
+        Response<Embedding> response = emodel.embed(msg);
+        return response.content().vectorAsList();
+
+        /*List<Float> results = new ArrayList<>();
         EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
                 .model("text-embedding-3-small")
                 .input(Collections.singletonList(msg))
@@ -378,5 +370,7 @@ public class PrivateChatbot {
             results.add(newb.get(i));
         }
         return results;
+        */
+
     }
 }

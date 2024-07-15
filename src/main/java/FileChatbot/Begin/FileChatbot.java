@@ -1,32 +1,37 @@
 package FileChatbot.Begin;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatMessageRole;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.*;
 
-import static Utilities.Misc.Double2Float;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
+import dev.langchain4j.model.output.Response;
 
 public class FileChatbot {
     private final List<String> asstHistory;      // history of all responses from LLM
     private final List<String> userHistory;      // history of all prompts sent to LLM
     private List<String> files;                  // filenames of files that contain related information
     private String instruction = "You are a well-respected Java expert and will respond as one.";        // additional behavior (system)
-    private String completion_format = "Respond in italiano";      // style or language of output
+    private String completion_format = "Please respond in English";      // style or language of output
     private List<String> context = new ArrayList<>();
-    private OpenAiService service;
+    private ChatLanguageModel cmodel;
 
     FileChatbot(String apikey) {
-        service = new OpenAiService(apikey, Duration.ofSeconds(30));
+        cmodel = OpenAiChatModel.builder()
+                .apiKey(apikey)
+                .modelName(OpenAiChatModelName.GPT_4_O)
+                .temperature(0.3)
+                .timeout(Duration.ofSeconds(30))
+                .maxTokens(512)
+                .build();
         asstHistory = new ArrayList<>();
         userHistory = new ArrayList<>();
     }
@@ -36,70 +41,60 @@ public class FileChatbot {
         setInstruction(instruction);
     }
 
-    FileChatbot(String apikey, List<String>files, String instruction) {
+    FileChatbot(String apikey, List<String> files, String instruction) {
         this(apikey, instruction);
         this.files = files;
     }
 
-    public OpenAiService getService() {
-        return service;
-    }
-    public void setService(OpenAiService service) {
-        this.service = service;
-    }
     public String getInstruction() {
         return instruction;
     }
+
     public void setInstruction(String instruction) {
         this.instruction = instruction;
     }
 
-    /**
-     * ****************************************************************************************
-     * getCompletions() - create the prompt from the messages, get the result, adjust the histories
-     *
-     * @param prompt
-     * @return
-     */
     public List<String> getCompletions(String prompt) {
         List<String> resultsFromLLM = new ArrayList<>();  // results coming back from LLM
         List<ChatMessage> messages = new ArrayList<>();
 
-        // step 1 - how to behave
-        ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), instruction);
-        messages.add(systemMessage);
+        /* step 1 - how to behave - create a SystemMessage with the instruction and add it to the list of user requests
+        SystemMessage sysmsg = new SystemMessage(...);
+        messages.add(...);
+        */
 
-        // step 2 - prepend context (user and assistant msgs)
-        addContext(prompt, messages);
+        /* step 2 - prepend context (user and assistant msgs)
+        addContext(...);
+        */
 
-        // step 3 - add the user's actual prompt
-        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), prompt);
-        messages.add(userMessage);
+        /*step 3 - add the user's actual prompt  - Create a UserMessage and add it to the list of user requests
+        UserMessage usermsg = new UserMessage(...);
+        messages.add(...);
+        */
 
-        // step 4 - specify the output format
-        final ChatMessage format = new ChatMessage(ChatMessageRole.SYSTEM.value(), completion_format);
-        messages.add(format);
+        /* step 4 - specify the output format using a SystemMessage and add it to the list of user requests
+        SystemMessage format = new SystemMessage(...);
+        messages.add(...);
+         */
 
-        showMessages(messages);     // Just to show the whole prompt sent to the LLM
+        //showMessages(messages);     // Just to show the whole prompt sent to the LLM
 
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
-                .builder()
-                .model("gpt-3.5-turbo")
-                .messages(messages)
-                .n(1)
-                .maxTokens(256)
-                .build();
+        /* step 5 - Ask the LLM for a completion and display it
+        Response<AiMessage> answer = cmodel.generate(messages);
+        System.out.println(answer.content().text());        // text() eliminates the 'noise' results
+         */
 
-        List<ChatCompletionChoice> completions = service.createChatCompletion(chatCompletionRequest).getChoices();
+        /* step 6 - Add the completion to the current set of completions for this request [Langchain4J only handles 1 completion]
+        resultsFromLLM.add(...);
+         */
 
-        for (ChatCompletionChoice s : completions) {
-            resultsFromLLM.add(s.getMessage().getContent().trim());
-        }
+        /*
+          step 7 - Update the AI assistant history and the user history
+        appendAsstHistory(...);         // Add the Assistant (LLM) response to the Asst history
+        appendUserHistory(...);         // Add the User's prompt to the Prompt history
+        */
 
-        appendAsstHistory(resultsFromLLM.get(0));   // Add the Assistant (LLM) response to the Asst history
-        appendUserHistory(prompt);                // Add the User's prompt to the Prompt history
-
-        return resultsFromLLM;
+        return resultsFromLLM;          // Returns a list - but Langchain4J only returns 1 completion unlike OpenAI low-level API
     }
 
     /**
@@ -109,15 +104,16 @@ public class FileChatbot {
      * @return
      */
     public String getCompletion(String prompt) {
-        return getCompletions(prompt).get(0).toString();       // just the first one for now
+        // Looks like Langchain4J does not give you access to OpenAI's multiple completion requests
+        return getCompletions(prompt).get(0);
     }
 
     /**
      * addContext() - add user history and the LLM's completion history to the overall context
-     * @param prompt
+     *
      * @param msg
      */
-    public void addContext(String prompt, List<ChatMessage> msg) {
+    public void addContext(List<ChatMessage> msg) {
         addFiles(this.files, msg);  // add the optional list of files
         addUserHistory(msg);        // add the user prompt history
         addAsstHistory(msg);        // add the LLM (assistant) history
@@ -125,10 +121,11 @@ public class FileChatbot {
 
     /**
      * addFiles() - add an optional list of files to the context (very primitive RAG system)
+     *
      * @param filenames
      * @param msg
      */
-    public void addFiles(List<String>filenames, List<ChatMessage> msg) {
+    public void addFiles(List<String> filenames, List<ChatMessage> msg) {
         for (String f : filenames) {
             String finfo = null;
             try {
@@ -136,26 +133,26 @@ public class FileChatbot {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            msg.add(new ChatMessage(ChatMessageRole.USER.value(), finfo));
+            msg.add(new UserMessage(finfo));
         }
     }
 
     public void addRAGDataToMsg(List<ChatMessage> msg, List<String> strmatches) {
         for (String s : strmatches) {
-            msg.add(new ChatMessage(ChatMessageRole.USER.value(), s));
+            msg.add(new UserMessage(s));
         }
     }
 
     public void addAsstHistory(List<ChatMessage> msg) {
         for (int i = 0; i < asstHistory.size(); i++) {
-            ChatMessage p = new ChatMessage(ChatMessageRole.ASSISTANT.value(), asstHistory.get(i));
+            ChatMessage p = new AiMessage(asstHistory.get(i));
             msg.add(p);
         }
     }
 
     public void addUserHistory(List<ChatMessage> msg) {
         for (int i = 0; i < userHistory.size(); i++) {
-            ChatMessage p = new ChatMessage(ChatMessageRole.USER.value(), userHistory.get(i));
+            ChatMessage p = new UserMessage(userHistory.get(i));
             msg.add(p);
         }
     }
@@ -188,22 +185,14 @@ public class FileChatbot {
     public static void showMessages(List<ChatMessage> mlist) {
         System.out.println("+START-----------------------------------------------------+ [" + mlist.size() + "]");
         for (ChatMessage cm : mlist) {
-            switch (cm.getRole()) {
-                case "system":
-                    System.out.println("SYSTEM: " + cm.getContent().toString());
-                    break;
-                case "user":
-                    System.out.println("  USER: " + cm.getContent().toString());
-                    break;
-                case "assistant":
-                    System.out.println("  ASST: " + cm.getContent().toString());
-                    break;
-                default:
-                    System.out.println("UNDEFINED ROLE!!!!");
-                    break;
+            switch (cm.type()) {
+                case SYSTEM -> System.out.println("SYSTEM: " + cm.text());
+                case USER -> System.out.println("  USER: " + cm.text());
+                case AI -> System.out.println("  ASST: " + cm.text());
+                default -> System.out.println("UNDEFINED ROLE!!!!");
             }
         }
-        // mlist.forEach(cm -> System.out.println("MSG: " + cm.getContent().toString()));
+        //mlist.forEach(cm -> System.out.println("MSG: " + cm.text()));
         System.out.println("+END-------------------------------------------------------+");
     }
 }

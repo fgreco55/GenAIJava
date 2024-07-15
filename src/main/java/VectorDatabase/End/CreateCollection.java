@@ -2,9 +2,12 @@ package VectorDatabase.End;
 
 import Utilities.Misc;
 
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.grpc.DataType;
 import io.milvus.grpc.MutationResult;
@@ -16,12 +19,12 @@ import io.milvus.param.index.CreateIndexParam;
 import io.milvus.param.partition.CreatePartitionParam;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class CreateCollection {
-    private OpenAiService service;
     private MilvusServiceClient mc;
     private long rowcount = 0;
 
@@ -40,16 +43,24 @@ public class CreateCollection {
         this.mc = mc;
     }
 
-    public OpenAiService getService() {
-        return service;
+    private ChatLanguageModel cmodel;
+    private EmbeddingModel emodel;
+
+    CreateCollection(String apikey) {
+        cmodel = OpenAiChatModel.builder()
+                .apiKey(apikey)
+                .modelName(OpenAiChatModelName.GPT_4_O)
+                .temperature(0.3)
+                .timeout(Duration.ofSeconds(30))
+                .maxTokens(512)
+                .build();
+        emodel = OpenAiEmbeddingModel.withApiKey(apikey);
     }
 
-    public void setService(OpenAiService service) {
-        this.service = service;
-    }
-
-    /** **************************************************************
+    /**
+     * *************************************************************
      * connectToMilvus() - connect to a running Milvus instance
+     *
      * @param host
      * @param port
      * @return
@@ -67,6 +78,7 @@ public class CreateCollection {
 
     /**
      * createCollection() - convenience method for creating collections of width OPENAI_VECSIZE
+     *
      * @param coll
      * @param colldesc
      */
@@ -74,11 +86,13 @@ public class CreateCollection {
         create_collection(coll, colldesc, OPENAI_VECSIZE);
     }
 
-    /** **********************************************************************
+    /**
+     * *********************************************************************
      * create_collection()
-     * @param coll      Name of collection
-     * @param colldesc  Description of the collection
-     * @param vecsize   Size of the embedding vector
+     *
+     * @param coll     Name of collection
+     * @param colldesc Description of the collection
+     * @param vecsize  Size of the embedding vector
      */
     public void create_collection(String coll, String colldesc, int vecsize) {
         R<RpcStatus> response = null;
@@ -142,46 +156,16 @@ public class CreateCollection {
         }
     }
 
-    /** *****************************************************************************
-     * getEmbeddingVec() - Get an embedding vector from the OpenAI embedding service
-     * @param service
-     * @param input
-     * @return
-     */
-    public static List<Embedding> getEmbeddingVec(@NotNull OpenAiService service, String input) {
-
-        EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                .model("text-embedding-3-small")
-                .input(Collections.singletonList(input))
-                .build();
-
-        List<Embedding> embeddings = service.createEmbeddings(embeddingRequest).getData();
-
-        return embeddings;
-    }
-
-    /** ***************************************************************************************************
-     * getEmbeddingVecAsFloat() - Convenience method since Milvus expects Floats but OpenAI returns Doubles
-     * @param service
-     * @param input
-     * @return
-     */
     @NotNull
-    public static List<Float> getEmbeddingVecAsFloat(OpenAiService service, String input) {
-        List<Float> results = new ArrayList<>();
-
-        List<Embedding> embedding = getEmbeddingVec(service, input);
-        List<Double> emb = embedding.get(0).getEmbedding();     // OpenAI returns Doubles... Milvus wants Floats...
-        List<Float> newb = Misc.Double2Float(emb);
-        int size = embedding.get(0).getEmbedding().size();
-        for (int i = 0; i < size; i++) {
-            results.add(newb.get(i));
-        }
-        return results;
+    public List<Float> getEmbeddingVec(String input) {
+        Response<dev.langchain4j.data.embedding.Embedding> response = emodel.embed(input);
+        return response.content().vectorAsList();
     }
 
-    /** ***************************************************************
+    /**
+     * **************************************************************
      * insert_file() - insert a textfile into the VDB
+     *
      * @param collname
      * @param fname
      */
@@ -196,10 +180,10 @@ public class CreateCollection {
         for (int i = 0; i < sents.size(); i++) {
             String mysentence = sents.get(i);
 
-            if (mysentence.isBlank() || mysentence == (String)null || mysentence.isEmpty())
+            if (mysentence.isBlank() || mysentence == (String) null || mysentence.isEmpty())
                 continue;
 
-            List<Float> embeddings = getEmbeddingVecAsFloat(service, mysentence);   // Get the embedding vector for a string
+            List<Float> embeddings = getEmbeddingVec(mysentence);   // Get the embedding vector for a string
             veclist.add(embeddings);
             ilist.add(Long.parseLong(rowcount + i + ""));
             filesentences.add(mysentence);

@@ -1,16 +1,15 @@
 package Embeddings.End;
 
 import Utilities.Misc;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
+
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
-import static Utilities.Misc.Double2double;
-import static Utilities.Misc.cosineSimilarity;
+import static Utilities.Misc.*;
 
 
 public class CompareEmbeddings {
@@ -18,29 +17,18 @@ public class CompareEmbeddings {
     public static void main(String[] args) throws IOException {
 
         String token = Misc.getAPIkey();
-        OpenAiService service = new OpenAiService(token);
+        EmbeddingModel model = OpenAiEmbeddingModel.withApiKey(token);
 
-        List<Embedding> one = getEmbeddingVec(service, "I like the java programming language.");
-        List<Double> emb1 = one.get(0).getEmbedding();
-        Double[] emb1d = emb1.toArray(new Double[0]);   // convert from List to array of Doubles for cosineSimilarity()
+        List<Float> one = getEmbeddingVec(model, "I like the java programming language.");
+        List<Float> two = getEmbeddingVec(model, "Pineapple does not belong on pizza.");
 
-        List<Embedding> two = getEmbeddingVec(service, "Pineapple does not belong on pizza.");
-        List<Double> emb2 = two.get(0).getEmbedding();
-        Double[] emb2d = emb2.toArray(new Double[0]);
-
-        double similarity = cosineSimilarity(Double2double(emb1d), Double2double(emb2d));
+        double similarity = cosineSimilarity(FloatList2doubleArray(one), FloatList2doubleArray(two));
         System.out.println("Cosine Similarity: " + similarity);
         System.out.println("Cosine Distance: " + (1 - similarity));
     }
 
-    public static List<Embedding> getEmbeddingVec(OpenAiService service, String input) {
-        EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                .model("text-embedding-3-small")
-                .input(Collections.singletonList(input))
-                .build();
-
-        List<Embedding> embeddings = service.createEmbeddings(embeddingRequest).getData();
-        return embeddings;
+    public static List<Float> getEmbeddingVec(EmbeddingModel model, String input) {
+        Response<dev.langchain4j.data.embedding.Embedding> response = model.embed(input);
+        return response.content().vectorAsList();
     }
 }
-

@@ -8,18 +8,15 @@ import java.util.List;
 
 public class SearchCollectionApp {
     public static void main(String[] args) throws IOException {
-        SearchCollection cc = new SearchCollection();
+        SearchCollection cc = new SearchCollection(Misc.getAPIkey());
 
         cc.setMc(cc.connectToMilvus("localhost", 19530));      // Connect to the VDB
-
-        String token = Misc.getAPIkey();                                // Connect to OpenAI
-        cc.setService(new OpenAiService(token));
 
         String collection = "frank5";
         cc.loadCollection(collection);
 
         List<String> matches;
-        matches = cc.searchDB(collection, "jdk 22", 5);
+        matches = cc.searchDB(collection, "Java", 10);      // Find top N-most similar entries in the VDB
         System.out.println("MATCHES ------------------------");
         for (String m : matches) {
             System.out.println("MATCH: [" + m + "]");

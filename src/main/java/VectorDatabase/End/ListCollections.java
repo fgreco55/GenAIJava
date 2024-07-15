@@ -61,8 +61,8 @@ public class ListCollections {
         System.out.println("COLLECTIONS ------ Before");
         System.out.println(lc.showCollections());
 
-        System.out.println("Dropping collection: " + COLLECTION_TO_DROP);
-        lc.drop_collection(COLLECTION_TO_DROP);
+        //System.out.println("Dropping collection: " + COLLECTION_TO_DROP);
+        //lc.drop_collection(COLLECTION_TO_DROP);
 
         System.out.println("COLLECTIONS ------ After");
         System.out.println(lc.showCollections());

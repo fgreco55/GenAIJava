@@ -1,8 +1,9 @@
 package VectorDatabase.Begin;
 
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 import io.milvus.client.MilvusServiceClient;
 import io.milvus.common.clientenum.ConsistencyLevelEnum;
 import io.milvus.grpc.SearchResults;
@@ -20,11 +21,15 @@ import java.util.List;
 import static Utilities.Misc.Double2Float;
 
 public class SearchCollection {
-    private OpenAiService service;
     private MilvusServiceClient mc;
     static final String FIELD1 = "sentence_id";          // chunk identifier - we're using sentences.  Could be other chunk types
     static final String FIELD2 = "sentence_text";       // actual sentence - retrieved later to be sent to the LLM
     static final String FIELD3 = "sentence_vector";     // the embedding vector
+    private EmbeddingModel emodel;
+
+    SearchCollection(String apikey) {
+        emodel = OpenAiEmbeddingModel.withApiKey(apikey);
+    }
 
     public MilvusServiceClient getMc() {
         return mc;
@@ -32,14 +37,6 @@ public class SearchCollection {
 
     public void setMc(MilvusServiceClient mc) {
         this.mc = mc;
-    }
-
-    public OpenAiService getService() {
-        return service;
-    }
-
-    public void setService(OpenAiService service) {
-        this.service = service;
     }
 
     /**
@@ -63,6 +60,7 @@ public class SearchCollection {
 
     /**
      * loadCollection() - collection must be loaded into memory to work
+     *
      * @param coll
      */
     public void loadCollection(String coll) {
@@ -77,7 +75,8 @@ public class SearchCollection {
     }
 
     /**
-     *   searchDB_using_targetvectors() - Using a List of vectors, search a collection for 'max' matches
+     * searchDB_using_targetvectors() - Using a List of vectors, search a collection for 'max' matches
+     *
      * @param coll
      * @param vec
      * @param max
@@ -111,8 +110,10 @@ public class SearchCollection {
         }
     }
 
-    /**  ************************************************************************
+    /**
+     * ***********************************************************************
      * getSearchData() - extract the highest semantic scores
+     *
      * @param resp
      * @param size
      * @return
@@ -132,29 +133,18 @@ public class SearchCollection {
 
     /**
      * sendEmbeddingRequest() - get an embedding vector and convert to List<Float> for Milvus
+     *
      * @param msg
      * @return
      */
     public List<Float> sendEmbeddingRequest(String msg) {
-
-            List<Float> results = new ArrayList<>();
-            EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                    .model("text-embedding-3-small")
-                    .input(Collections.singletonList(msg))
-                    .build();
-
-            List<Embedding> embedding = getService().createEmbeddings(embeddingRequest).getData();
-            List<Double> emb = embedding.get(0).getEmbedding();     // OpenAI returns Doubles... Milvus wants Floats...
-            List<Float> newb = Double2Float(emb);
-            int size = embedding.get(0).getEmbedding().size();
-            for (int i = 0; i < size; i++) {
-                results.add(newb.get(i));
-            }
-            return results;
-        }
+        Response<Embedding> response = emodel.embed(msg);
+        return response.content().vectorAsList();
+    }
 
     /**
      * searchDB() - search for "max" matches on a string in collection "coll"
+     *
      * @param coll
      * @param target
      * @param max

@@ -1,57 +1,60 @@
 package Completions.Begin;
 
-import Utilities.Misc;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.service.OpenAiService;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
+import dev.langchain4j.model.output.Response;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-
-import static Utilities.Misc.getConfigProperties;
 
 public class SimpleChatCompletion {
     public static void main(String[] args) throws IOException {
 
-        String token = Misc.getAPIkey();
-        OpenAiService service = new OpenAiService(token, Duration.ofSeconds(30));
-
-        final List<ChatMessage> messages = new ArrayList<>();
+        String token = System.getenv("OPENAI_API_KEY");
 
         /*
-         Create a System message and a User message
-        final ChatMessage systemMessage = new ChatMessage(ChatMessageRole.SYSTEM.value(), ... );
-        final ChatMessage userMessage = new ChatMessage(ChatMessageRole.USER.value(), ...);
-        */
+         Create a list of ChatMessages
 
-        /* Add them to the messages List
+         Create a SystemMessage to instruct the LLM on how to act
+         Create a UserMessage with your prompt
+
+         Add these messages to the list
+        /*
+        List<ChatMessage> messages = new ArrayList<>();
+
+        SystemMessage sysmsg = new SystemMessage(...);
+        UserMessage usermsg = new UserMessage(...);
+
         messages.add(...);
         messages.add(...);
-        */
-
-        /*
-         Create a chatCompletionRequest with its builder
-
-        ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
-                .model(...model-name...)        // chat endpoint
-                .messages(...your messages...)  // your chat “messages”
-                .n(1)                          // num of completions
-                .maxTokens(64)                 // max size of each completion
-                .build();
-        */
-
-        /*
-         Ask the LLM for completion
-
-        List<ChatCompletionChoice> completions = service.createChatCompletion(chatCompletionRequest).getChoices();
-        */
-
-        /* Display the completions...
-        for (ChatCompletionChoice s : completions) {
-            System.out.println(s.getMessage().getContent().trim());
-        }
          */
+
+        /*
+        Create a ChatLanguageModel with the apikey and some additional parameters
+
+        ChatLanguageModel cmodel = OpenAiChatModel.builder()
+                .apiKey(...)
+                .modelName(...)
+                .temperature(...)
+                .timeout(Duration.ofSeconds(30))
+                .maxTokens(...)
+                .build();
+         */
+
+        /*
+         Send the prompt and get the completion
+
+        Response<AiMessage> answer = cmodel.generate(...);
+        System.out.println(answer.content().text());
+         */
+
+
     }
 }
