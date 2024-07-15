@@ -1,7 +1,6 @@
 package VectorDatabase.End;
 
 import Utilities.Misc;
-import com.theokanning.openai.service.OpenAiService;
 
 import java.io.IOException;
 
@@ -18,6 +17,6 @@ public class CreateCollectionApp {
         System.out.println("**********Inserting java22.txt");
         cc.insert_file("frank" + ver, "./src/main/resources/java22.txt");
         System.out.println("**********Inserting Mike info on Java22");
-        cc.insert_file("frank" + ver, "./src/main/resources/java22-mike.txt");
+        //cc.insert_file("frank" + ver, "./src/main/resources/java22-mike.txt");
     }
 }
