@@ -27,20 +27,28 @@ public class Misc {
     public static String getProperty(String propfile, String propname) throws IOException {
         Properties prop = getConfigProperties(propfile);
         if (prop == (Properties) null) {
-            System.err.println("Cannot find OpenAI API key.  Your path to the properties is probably incorrect.");
+            System.err.println("Cannot find properties file.  Your path to the properties is probably incorrect.");
             System.exit(1);
         }
         return prop.getProperty(propname);
     }
 
     public static String getAPIkey() throws IOException {
-        return getProperty(DEFAULT_CONFIG, "chatgpt.apikey");
+        //return getProperty(DEFAULT_CONFIG, "chatgpt.apikey");
+        return System.getenv("OPENAI_API_KEY");
     }
 
     public static double[] Double2double(Double[] indouble) {
         double[] result = new double[indouble.length];
         for (int i = 0; i < indouble.length; i++) {
             result[i] = indouble[i].doubleValue();
+        }
+        return result;
+    }
+    public static double[] FloatList2doubleArray(List<Float> floatList) {
+        double[] result = new double[floatList.size()];
+        for (int i = 0; i < floatList.size(); i++) {
+            result[i] = floatList.get(i);
         }
         return result;
     }
@@ -79,6 +87,14 @@ public class Misc {
         List<Float> flist = new ArrayList<>();
         for (int i = 0; i < d.size(); i++) {
             flist.add(d.get(i).floatValue());
+        }
+        return flist;
+    }
+
+    public static List<Double> Float2Double(List<Float> fl) {
+        List<Double> flist = new ArrayList<>();
+        for (int i = 0; i < fl.size(); i++) {
+            flist.add(fl.get(i).doubleValue());
         }
         return flist;
     }
