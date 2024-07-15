@@ -1,0 +1,73 @@
+JDK 22, the first non-LTS release since JDK 21, has reached its second release candidate phase, as declared by Mark Reinhold, chief architect of the Java Platform Group at Oracle. The main-line source repository, forked to the JDK stabilization repository in mid-December 2023 (Rampdown Phase One), defines the feature set for JDK 22. Critical bugs, such as regressions or serious functionality issues, may be addressed but must be approved via the Fix-Request process. As per the release schedule, JDK 22 will be formally released on March 19, 2024.
+
+The final set of 12 new features, in the form of JEPs, can be separated into four (4) categories: Core Java Library, Java Language Specification, HotSpot and Java Tools.
+
+Six (6) of these new features are categorized under Core Java Library:
+
+JEP 454: Foreign Function & Memory API
+JEP 457: Class-File API (Preview)
+JEP 460: Vector API (Seventh Incubator)
+JEP 461: Stream Gatherers (Preview)
+JEP 462: Structured Concurrency (Second Preview)
+JEP 464: Scoped Values (Second Preview)
+Four (4) of these new features are categorized under Java Language Specification:
+
+JEP 447: Statements before super(...) (Preview)
+JEP 456: Unnamed Variables & Patterns
+JEP 459: String Templates (Second Preview)
+JEP 463: Implicitly Declared Classes and Instance Main Methods (Second Preview)
+One (1) of these new features are categorized under HotSpot:
+
+JEP 423: Region Pinning for G1
+And finally, one (1) of these new features is categorized under Java Tools:
+
+JEP 458: Launch Multi-File Source-Code Programs
+We examine some of these new features and include where they fall under the auspices of the four major Java projects - Amber, Loom, Panama and Valhalla - designed to incubate a series of components for eventual inclusion in the JDK through a curated merge.
+
+Project Amber
+JEP 463, Implicitly Declared Classes and Instance Main Methods (Second Preview), formerly known as Unnamed Classes and Instance Main Methods (Preview), Flexible Main Methods and Anonymous Main Classes (Preview) and Implicit Classes and Enhanced Main Methods (Preview), incorporates enhancements in response to feedback from the previous round of preview, namely JEP 445, Unnamed Classes and Instance Main Methods (Preview). This JEP proposes to "evolve the Java language so that students can write their first programs without needing to understand language features designed for large programs." This feature moves forward the September 2022 blog post, Paving the on-ramp, by Brian Goetz, Java language architect at Oracle. Gavin Bierman, consulting member of technical staff at Oracle, has published the first draft of the specification document for review by the Java community. Further details on JEP 445 may be found in this InfoQ news story.
+
+JEP 459, String Templates (Second Preview), provides a second preview from the first: JEP 430, String Templates (Preview), delivered in JDK 21. This feature enhances the Java programming language with string templates, which are string literals containing embedded expressions that are interpreted at runtime, where the embedded expressions are evaluated and verified. More details on JEP 430 may be found in this InfoQ news story.
+
+JEP 456, Unnamed Variables & Patterns, proposes to finalize this feature after one previous round of preview: JEP 443, Unnamed Patterns and Variables (Preview), delivered in JDK 21. This feature will "enhance the language with unnamed patterns, which match a record component without stating the component's name or type, and unnamed variables, which can be initialized but not used." Both of these are denoted by the underscore character, as in r instanceof _(int x, int y) and r instanceof _.
+
+JEP 447, Statements before super(...) (Preview), proposes to allow statements that do not reference an instance being created to appear before the this() or super() calls in a constructor, and preserves existing safety and initialization guarantees for constructors. Bierman has also provided an initial specification of this feature for the Java community to review and provide feedback.
+
+Project Loom
+JEP 464, Scoped Values (Second Preview), formerly known as Extent-Local Variables (Incubator), proposes a second preview, without change, in order to gain additional experience and feedback from one round of incubation and one round of preview: JEP 446, Scoped Values (Preview), delivered in JDK 21; and JEP 429, Scoped Values (Incubator), delivered in JDK 20. This feature enables the sharing of immutable data within and across threads. This is preferred to thread-local variables, especially when using large numbers of virtual threads.
+
+JEP 462, Structured Concurrency (Second Preview), proposes a second preview, without change, in order to gain more feedback from the previous round of preview: JEP 453, Structured Concurrency (Preview), delivered in JDK 21. This feature simplifies concurrent programming by introducing structured concurrency to "treat groups of related tasks running in different threads as a single unit of work, thereby streamlining error handling and cancellation, improving reliability, and enhancing observability."
+
+Project Panama
+JEP 460, Vector API (Seventh Incubator), incorporates enhancements in response to feedback from the previous six rounds of incubation: JEP 448, Vector API (Sixth Incubator), delivered in JDK 21; JEP 438, Vector API (Fifth Incubator), delivered in JDK 20; JEP 426, Vector API (Fourth Incubator), delivered in JDK 19; JEP 417, Vector API (Third Incubator), delivered in JDK 18; JEP 414, Vector API (Second Incubator), delivered in JDK 17; and JEP 338, Vector API (Incubator), delivered as an incubator module in JDK 16. The most significant change from JEP 448 includes an enhancement to the JVM Compiler Interface (JVMCI) to support Vector API values.
+
+JEP 454, Foreign Function & Memory API, proposes to finalize this feature after two rounds of incubation and three rounds of preview: JEP 412, Foreign Function & Memory API (Incubator), delivered in JDK 17; JEP 419, Foreign Function & Memory API (Second Incubator), delivered in JDK 18; JEP 424, Foreign Function & Memory API (Preview), delivered in JDK 19; JEP 434, Foreign Function & Memory API (Second Preview), delivered in JDK 20; and JEP 442, Foreign Function & Memory API (Third Preview), delivered in JDK 21. Improvements since the last release include: a new Enable-Native-Access manifest attribute that allows code in executable JARs to call restricted methods without the use of the --enable-native-access flag; enabling clients to programmatically build C function descriptors and avoid platform-specific constants; improved support for variable-length arrays in native memory; and support for multiple charsets in native strings. More details on JEP 454 may be found in this InfoQ news story.
+
+JDK 23
+Scheduled for a GA release in September 2024, there is only one JEP targeted for JDK 23 at this time. However, based on a number of JEP candidates and drafts, especially those that have been submitted, we can surmise which additional JEPs have the potential to be included in JDK 23.
+
+JEP 455, Primitive Types in Patterns, instanceof, and switch (Preview), has been Targeted for JDK 23. This JEP, under the auspices of Project Amber, proposes to enhance pattern matching by allowing primitive type patterns in all pattern contexts and extending instanceof and switch to work with all primitive types. Aggelos Biboudis, principal member of technical staff at Oracle, has recently published an updated draft specification for this feature.
+
+JEP 468, Derived Record Creation (Preview), has been promoted from its JDK Draft 8321133 to Candidate status. This JEP proposes to enhance the Java language with derived creation for records. Since records are immutable objects, developers frequently create new records from old records to model new data. Derived creation streamlines code by deriving a new record from an existing record, specifying only the components that are different.
+
+JEP 467, Markdown Documentation Comments, has been promoted from its JDK Draft 8316039 to Candidate status. This feature proposes to enable JavaDoc documentation comments to be written in Markdown rather than a mix of HTML and JavaDoc @ tags. This will allow for documentation comments that are easier to write and easier to read in source form.
+
+JEP 466, Class-File API (Second Preview), has been promoted from its JEP Draft 8324965 to Candidate status. This JEP proposes a second round of preview to obtain feedback from the previous round: JEP 457, Class-File API (Preview), to be delivered in the upcoming release of JDK 22. This feature provides an API for parsing, generating, and transforming Java class files. This will initially serve as an internal replacement for ASM, the Java bytecode manipulation and analysis framework, in the JDK with plans to have it opened as a public API. Goetz has characterized ASM as "an old codebase with plenty of legacy baggage" and provided background information on how this draft will evolve and ultimately replace ASM.
+
+JEP 465, String Templates, has been promoted from its JEP Draft 8323333 to Candidate status. This JEP proposes to finalize this feature after two rounds of preview, namely JEP 459, String Templates (Second Preview), to be delivered in the upcoming release of JDK 22, and JEP 430, String Templates (Preview), delivered in JDK 21. This feature enhances the Java programming language with string templates, which are string literals containing embedded expressions that are interpreted at runtime, where the embedded expressions are evaluated and verified. Further details on JEP 430 may be found in this InfoQ news story.
+
+JEP 401, Null-Restricted Value Object Storage (Preview), formerly known as Primitive Classes (Preview), under the auspices of Project Valhalla, introduces developer-declared primitive classes, which are special kinds of value classes as defined by the Value Objects API, that define new primitive types.
+
+Paul Sandoz, Java architect at Oracle, has submitted JEP Draft 8326878, Vector API (Incubator). After seven rounds of incubation that were integrated from JDK 16 through JDK 22, this JEP proposes to re-incubate the API in JDK 23 with no API changes and no substantial implementation changes relative to JDK 22. This feature will introduce an API to "express vector computations that reliably compile at runtime to optimal vector instructions on supported CPU architectures, thus achieving performance superior to equivalent scalar computations."
+
+Bierman and Archie Cobbs, founder and CEO at PatientEXP, have introduced JEP Draft 8325803, Flexible Constructor Bodies (Second Preview), a JEP that proposes a second round of preview and a name change to obtain feedback from the previous round of preview, namely JEP 447, Statements before super(...) (Preview), to be delivered in the upcoming release of JDK 22. This feature allows statements that do not reference an instance being created to appear before the this() or super() calls in a constructor; and preserve existing safety and initialization guarantees for constructors. Changes in this JEP include: a treatment of local classes; and a relaxation of the restriction that fields can not be accessed before an explicit constructor invocation to a requirement that fields can not be read before an explicit constructor invocation. Bierman has provided an initial specification of this JEP for the Java community to review and provide feedback.
+
+JEP Draft 8307341, Prepare to Restrict The Use of JNI, proposes to restrict the use of the inherently unsafe Java Native Interface (JNI) in conjunction with the use of restricted methods in the Foreign Function & Memory (FFM) API that is expected to become a final feature in JDK 23. The alignment strategy, starting in JDK 23, will have the Java runtime display warnings about the use of JNI unless an FFM user enables unsafe native access on the command line. It is anticipated that in the release after JDK 23, using JNI will throw exceptions instead of warnings.
+
+JEP Draft 8313278, Ahead of Time Compilation for the Java Virtual Machine, proposes to "enhance the Java Virtual Machine with the ability to load Java applications and libraries compiled to native code for faster startup and baseline execution."
+
+JEP Draft 8312611, Computed Constants (Preview), introduces the concept of computed constants, which are defined as immutable value holders that are initialized at most once. This offers the performance and safety benefits of final fields while offering greater flexibility regarding initialization timing. This feature will debut as a preview API.
+
+JEP Draft 8283227, JDK Source Structure, an informational JEP type, describes the overall layout and structure of the JDK source code and related files in the JDK repository. This JEP proposes to help developers adapt to the source code structure, as described in JEP 201, Modular Source Code, delivered in JDK 9.
+
+JEP Draft 8278252, JDK Packaging and Installation Guidelines, an informational JEP, proposed to provide guidelines for creating JDK installers on macOS, Linux and Windows to reduce the risks of collisions among JDK installations by different JDK providers. The intent is to promote a better experience when installing update releases of the JDK by formalizing installation directory names, package names, and other elements of installers that may lead to conflicts.
