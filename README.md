@@ -35,6 +35,8 @@ We'll learn how to create a Chatbot from scratch. Even though Machine Learning i
 * Give the key a name to help you remember its purpose
 * Select the type of Permissions (we can use ‘All’ for our labs)
 * Click on the  "Create secret key" button
+* Set the environment variable "OPENAI_API_KEY" in IntelliJ with your OpenAI key.
+  [Run->Edit Configurations->Environment Variables]
 
 ## INSTALLING MILVUS WITH DOCKER COMPOSE
   https://milvus.io/docs/v2.3.x/install_standalone-docker-compose.md
