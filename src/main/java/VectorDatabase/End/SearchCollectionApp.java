@@ -1,7 +1,6 @@
 package VectorDatabase.End;
 
 import Utilities.Misc;
-import com.theokanning.openai.service.OpenAiService;
 
 import java.io.IOException;
 import java.util.List;
