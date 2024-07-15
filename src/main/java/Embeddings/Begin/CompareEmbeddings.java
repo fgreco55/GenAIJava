@@ -1,56 +1,47 @@
 package Embeddings.Begin;
 
 import Utilities.Misc;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.service.OpenAiService;
+
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
+import dev.langchain4j.model.output.Response;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
-import static Utilities.Misc.Double2double;
-import static Utilities.Misc.cosineSimilarity;
+import static Utilities.Misc.*;
 
 
 public class CompareEmbeddings {
 
     public static void main(String[] args) throws IOException {
 
-        String token = Misc.getAPIkey();
-        OpenAiService service = new OpenAiService(token);
-
         /*
-         Get the embedding vector for the first string
+         Get the api key and create an embedding model.
 
-        List<Embedding> one = getEmbeddingVec(...);
-        List<Double> emb1 = one.get(0).getEmbedding();  // Get the first element
-        Double[] emb1d = emb1.toArray(new Double[0]);   // convert from List to array of Doubles
+        String token = Misc.getAPIkey();
+        EmbeddingModel model = OpenAiEmbeddingModel.withApiKey(...);
         */
 
         /*
-         Get the embedding vector for the second string
-        List<Embedding> two = getEmbeddingVec(...);
-        List<Double> emb2 = two.get(0).getEmbedding();
-        Double[] emb2d = emb2.toArray(new Double[0]);
-         */
+         Get the embedding vectors for two strings
+
+        List<Float> one = getEmbeddingVec(..., "...");
+        List<Float> two = getEmbeddingVec(..., "...");
+        */
 
         /*
-         Calculate the cosine similarity and display it
+          Calculate the cosine similarity and display it along with the cosine distance.
+          Use the FloatList2doubleArray() method in the Utilities.Misc class
 
-        double similarity = cosineSimilarity(...);
+        double similarity = cosineSimilarity(FloatList2doubleArray(...), FloatList2doubleArray(...));
         System.out.println("Cosine Similarity: " + similarity);
+        System.out.println("Cosine Distance: " + (1 - similarity));
         */
     }
 
-    public static List<Embedding> getEmbeddingVec(OpenAiService service, String input) {
-        EmbeddingRequest embeddingRequest = EmbeddingRequest.builder()
-                .model("text-embedding-3-small")
-                .input(Collections.singletonList(input))
-                .build();
-
-        List<Embedding> embeddings = service.createEmbeddings(embeddingRequest).getData();
-        return embeddings;
+    public static List<Float> getEmbeddingVec(EmbeddingModel model, String input) {
+        Response<dev.langchain4j.data.embedding.Embedding> response = model.embed(input);
+        return response.content().vectorAsList();
     }
 }
-
