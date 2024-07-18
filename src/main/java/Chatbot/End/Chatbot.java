@@ -61,9 +61,9 @@ public class Chatbot {
         //showMessages(messages);     // Just to show the whole prompt sent to the LLM
 
         Response<AiMessage> answer = cmodel.generate(messages);
-        System.out.println(answer.content().text());        // text() eliminates the 'noise' results
+        //System.out.println(answer.content().text());        // text() eliminates the 'noise' results
 
-        resultsFromLLM.add(answer.content().text());
+        resultsFromLLM.add(answer.content().text());        // text() eliminates the 'noise' results
 
         appendAsstHistory(answer.content().text());   // Add the Assistant (LLM) response to the Asst history
         appendUserHistory(prompt);                  // Add the User's prompt to the Prompt history
