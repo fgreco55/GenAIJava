@@ -1,5 +1,6 @@
 package Completions.Begin;
 
+import Utilities.Misc;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
@@ -17,7 +18,7 @@ import java.util.List;
 public class SimpleChatCompletion {
     public static void main(String[] args) throws IOException {
 
-        String token = System.getenv("OPENAI_API_KEY");
+        String token = Misc.getAPIkey();
 
         /*
          Create a list of ChatMessages
