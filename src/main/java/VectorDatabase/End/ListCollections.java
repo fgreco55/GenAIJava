@@ -11,7 +11,6 @@ import io.milvus.param.collection.ShowCollectionsParam;
 
 public class ListCollections {
     private MilvusServiceClient mc;
-    static final String COLLECTION_TO_DROP = "frank5";
 
     public MilvusServiceClient getMc() {
         return mc;
@@ -44,13 +43,6 @@ public class ListCollections {
         return buffer;
     }
 
-    public void drop_collection(String coll) {
-        DropCollectionParam dropParam = DropCollectionParam.newBuilder()
-                .withCollectionName(coll)
-                .build();
-        R<RpcStatus> response = mc.dropCollection(dropParam);
-    }
-
     /******************************************************************
      *  main
      ******************************************************************/
@@ -58,13 +50,7 @@ public class ListCollections {
         ListCollections lc = new ListCollections();
         lc.setMc(lc.connectToMilvus("localhost", 19530));
 
-        System.out.println("COLLECTIONS ------ Before");
-        System.out.println(lc.showCollections());
-
-        //System.out.println("Dropping collection: " + COLLECTION_TO_DROP);
-        //lc.drop_collection(COLLECTION_TO_DROP);
-
-        System.out.println("COLLECTIONS ------ After");
+        System.out.println("COLLECTIONS ------");
         System.out.println(lc.showCollections());
     }
 }

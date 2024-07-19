@@ -44,13 +44,6 @@ public class ListCollections {
           return buffer;
       }
 
-      public void drop_collection(String coll) {
-          DropCollectionParam dropParam = DropCollectionParam.newBuilder()
-                  .withCollectionName(coll)
-                  .build();
-          R<RpcStatus> response = mc.dropCollection(dropParam);
-      }
-
       /******************************************************************
        *  main
        ******************************************************************/
@@ -66,22 +59,8 @@ public class ListCollections {
           /*
            Step 2 - Show all the collections in the database
 
-          System.out.println("COLLECTIONS ------ Before");
-          System.out.println();
-          */
-
-          /*
-           Step 3 - Drop a collection
-
-          System.out.println("Dropping collection: " + COLLECTION_TO_DROP);
-          lc.drop_collection(...);
-          */
-
-          /*
-           Step 4 - Show all the collections again to verify the drop
-
-          System.out.println("COLLECTIONS ------ After");
-          System.out.println();
+          System.out.println("COLLECTIONS ------");
+          System.out.println(xxx);
           */
       }
 }
