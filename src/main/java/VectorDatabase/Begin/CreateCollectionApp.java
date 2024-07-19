@@ -15,8 +15,7 @@ public class CreateCollectionApp {
          */
 
         /*  Step 3 - Create a collection, give it a useful description
-        int ver = 5;
-        cc.createCollection("frank" + ver, "...");
+        cc.createCollection("your coll name", "...");
         */
 
         /*  Step 4 - Load some files into that collection
