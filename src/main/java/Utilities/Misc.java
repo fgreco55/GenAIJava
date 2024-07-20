@@ -38,6 +38,10 @@ public class Misc {
         return System.getenv("OPENAI_API_KEY");
     }
 
+    public static String getUser() {
+        return System.getenv("USER");
+    }
+
     public static double[] Double2double(Double[] indouble) {
         double[] result = new double[indouble.length];
         for (int i = 0; i < indouble.length; i++) {
