@@ -74,7 +74,7 @@ public class Misc {
         return Math.sqrt(sum);
     }
 
-    // Function to calculate cosine similarity
+    // Function to calculate cosine similarity between two embedding vectors
     public static double cosineSimilarity(double[] vec1, double[] vec2) {
         double dotProduct = dotProduct(vec1, vec2);
         double magnitudeVec1 = magnitude(vec1);
